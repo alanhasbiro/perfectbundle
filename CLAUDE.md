@@ -1,5 +1,7 @@
 # CLAUDE.md - PerfectBundle
 
+@AGENTS.md
+
 ## Project Overview
 
 AI gift bundle picker: short quiz about the recipient → 3 themed bundles of 3–6 complementary items → region-aware retailer links (Amazon/Etsy/eBay, affiliate-ready). Web first; React Native (Expo) later.
