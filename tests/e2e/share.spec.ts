@@ -24,7 +24,7 @@ test.describe("share page", () => {
     await expect(
       page.getByRole("heading", { name: "A gift bundle, shared with you 🎁" })
     ).toBeVisible();
-    await expect(page.getByText("E2E Test Bundle")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "E2E Test Bundle" })).toBeVisible();
     await expect(page.getByText("Test Item One")).toBeVisible();
     await expect(page).toHaveTitle(/E2E Test Bundle/);
   });
