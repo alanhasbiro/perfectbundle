@@ -27,12 +27,16 @@ export default function Home() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: 0.6 }}
+        className="flex flex-col items-center gap-3"
       >
         <Link
           href="/quiz"
           className="rounded-full bg-foreground px-8 py-3 text-background transition hover:opacity-85"
         >
           Start the quiz
+        </Link>
+        <Link href="/trending" className="text-sm underline opacity-70 hover:opacity-100">
+          Or browse trending bundles
         </Link>
       </motion.div>
     </main>
