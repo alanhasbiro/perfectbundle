@@ -15,6 +15,7 @@ import type * as generationCache from "../generationCache.js";
 import type * as rateLimit from "../rateLimit.js";
 import type * as seed from "../seed.js";
 import type * as seedData from "../seedData.js";
+import type * as testSupport from "../testSupport.js";
 
 import type {
   ApiFromModules,
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   rateLimit: typeof rateLimit;
   seed: typeof seed;
   seedData: typeof seedData;
+  testSupport: typeof testSupport;
 }>;
 
 /**
