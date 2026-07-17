@@ -114,7 +114,7 @@
 ### Recipient Profiles (F7)
 - [x] P1 Profile CRUD (name, age, interests, notes) — `convex/recipientProfiles.ts` (auth-gated, ownership-checked), `/profiles` page, `ProfileForm` reused for create/edit
 - [x] P1 One-click "new bundles for X" with pre-filled quiz — `src/lib/quiz/prefill.ts` (unit-tested) seeds the same sessionStorage the quiz hydrates from; person-level fields prefilled, occasion/budget/urgency left for the user to redo per gift
-- [ ] P1 Past-bundle memory dedupes future suggestions — not started
+- [x] P1 Past-bundle memory dedupes future suggestions — `pastItemNames` on `recipientProfiles`, threaded via `QuizState.profileId` (kept out of `QuizAnswers`/cache hash), `generateBundles.generate` fetches+excludes past items in the prompt and appends new ones after a fresh (non-cached) generation; cache key folds in profileId to prevent a stale hit bypassing dedup (plan: docs/superpowers/plans/2026-07-18-m4-past-bundle-memory.md)
 - [x] P1 Event: profile_created fires on save
 
 ### Occasion Reminders (F7)

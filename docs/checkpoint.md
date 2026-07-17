@@ -8,10 +8,10 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Progress** | ~67% (M1 + M2 P0 done; production Convex deployed; M5 E2E core + cross-browser + a11y all green; M3 PostHog config fixed + live) |
-| **Current Phase** | M3 analytics wiring fixed and deployed (dashboard build-out still manual/pending); M4 starting (Clerk keys received) |
+| **Overall Progress** | ~70% (M1 + M2 P0 done; production Convex deployed; M5 E2E core + cross-browser + a11y green; M3 PostHog config fixed + live; M4 auth/save/profiles + past-bundle memory done) |
+| **Current Phase** | M4 accounts & retention (save, profiles, recipient prefill, past-bundle memory done; reminders + Popular tab + signup event still to build) |
 | **On Track?** | ✅ Yes |
-| **Last Updated** | 2026-07-17 |
+| **Last Updated** | 2026-07-18 |
 | **Last Commit** | see change log |
 
 ### Tasks Status
@@ -20,11 +20,11 @@ See `docs/tasks.md` for the live task list. Summary:
 
 | Metric | Value |
 |--------|-------|
-| **Active Milestone** | M2 (P0 done) + M5 (done except Lighthouse) → M3/M4 next |
-| **Tasks Complete** | 44 / ~85 |
+| **Active Milestone** | M4 accounts & retention (save/profiles/past-bundle memory done; reminders + Popular tab + signup event next) |
+| **Tasks Complete** | 49 / ~85 |
 | **Tasks In Progress** | 0 |
-| **Tasks Blocked** | 2 (M3, M4 — owner keys pending) |
-| **Active Plan** | `docs/superpowers/plans/2026-07-17-m5-cross-browser-a11y.md` (complete) |
+| **Tasks Blocked** | 2 (M3 dashboards manual; real-photo/direct-links on retailer API approvals) |
+| **Active Plan** | `docs/superpowers/plans/2026-07-18-m4-past-bundle-memory.md` (complete) |
 
 ### Progress by Milestone
 
@@ -34,13 +34,16 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2. Core MVP (P0) | ✅ Complete | 95% | Quiz, engine, links, results UI, share, trending all done and live-verified. Only deferred: item swap/per-bundle regenerate (P1, needs new engine capability — backlogged) |
 | 3. Analytics | 🔄 In Progress | 25% | Fixed real bugs: PostHog project is on EU cloud but key/host in Vercel were wrong region (401s) — corrected and redeployed; confirmed `config.js` resolves 200 in production. Could NOT get a definitive automated (Playwright) confirmation that `posthog.capture()` reaches the network in this dev/build setup despite extensive debugging (SDK inits fine, consent optedIn, direct HTTP capture works) — needs one manual check: visit perfectbundle.vercel.app, then check PostHog → Activity → Events a few minutes later. Dashboard/funnel/attribution insights (P0) still need manual PostHog UI setup — no personal API key available to automate |
 | — | Real product photos + direct links | ⏸️ Blocked | User feedback: bundle items show generic retailer *search* links with no photos. Plan: eBay/Etsy free product-search APIs return real photo + direct URL (cached at generation time); Amazon stays search-link-only long-term (PA-API requires an *already-approved* Associate account with qualifying sales — chicken-and-egg, can't shortcut). Current status: **all three blocked** — Amazon + eBay awaiting approval; Etsy has a keystring+shared secret but the API returns `403 "key not found or not active"` (likely app not yet Active in Etsy's dashboard, or needs a few min to propagate) — user chose to hold off rather than debug further. Revisit once any one of the three is confirmed working |
-| 4. Accounts & Retention | 🔄 In Progress | 45% | Clerk auth, save-bundle + guest→signup upsell, and "My bundles" page all live in production. Recipient profiles now done too: `convex/recipientProfiles.ts` CRUD (auth-gated + ownership-checked), `/profiles` page (create/edit/delete), and a unit-tested prefill helper (`src/lib/quiz/prefill.ts`) for "New bundles for X" — seeds the quiz's own sessionStorage state so it's indistinguishable from a normal quiz run, just pre-answered. Quiz's hardcoded option lists (relationships/age bands/genders/interests) extracted to `src/lib/quiz/options.ts` so the profile form can't drift out of sync with the quiz steps. Still using Clerk **dev-mode keys** in production (no prod instance yet). Still to build: past-bundle dedup, occasion reminders (Resend cron), Popular tab |
+| 4. Accounts & Retention | 🔄 In Progress | 55% | Clerk auth, save-bundle + guest→signup upsell, and "My bundles" page all live in production. Recipient profiles done: `convex/recipientProfiles.ts` CRUD (auth-gated + ownership-checked), `/profiles` page (create/edit/delete), and a unit-tested prefill helper (`src/lib/quiz/prefill.ts`) for "New bundles for X". Past-bundle memory now live too — `recipientProfiles.pastItemNames` feeds an "avoid repeating" prompt instruction, updated after each fresh (non-cached) generation; `profileId` threads through `QuizState` (kept out of `QuizAnswers`/cache hash), and the generation-cache key folds in `profileId` so a stale hit can't bypass dedup. Quiz's hardcoded option lists extracted to `src/lib/quiz/options.ts`. Still using Clerk **dev-mode keys** in production (no prod instance yet). Still to build: occasion reminders (Resend cron), Popular tab, wire `signup` PostHog event |
 | 5. Testing & Polish | 🔄 In Progress | 80% | E2E suite: 41 passing across chromium/firefox/webkit/mobile-chrome (3 intentionally skipped off-chromium — quota control) + baseline a11y audit passing on all 4. Only Lighthouse performance scoring remains |
 | 6. Launch | ⏳ Not Started | 0% | |
 
 ---
 
 ## Completed Items ✅
+
+### This Session (2026-07-18)
+- [x] M4 past-bundle memory: `recipientProfiles.pastItemNames` schema field + `getByIdInternal`/`appendPastItemsInternal` (cap 50, deduped); `buildBundlePrompt` gains an optional `pastItemNames` param → "avoid repeating" prompt line + rule; `QuizState.profileId` threaded through prefill → submit → results (deliberately outside `QuizAnswers` so the cache hash/stored quiz shape are unchanged for the no-profile path); `generateBundles.generate` verifies profile ownership server-side, excludes past items, folds `profileId` into the cache key, and appends new item names after a fresh generation. Plan: `docs/superpowers/plans/2026-07-18-m4-past-bundle-memory.md`. Verified: full Vitest suite 79/79 green, `tsc --noEmit` clean, `next build` clean, Playwright chromium 13/13 (incl. real-Gemini quiz→results completion).
 
 ### This Session (2026-07-17)
 - [x] Brainstorming: design approved → `docs/superpowers/specs/2026-07-17-perfectbundle-design.md`
@@ -178,7 +181,12 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-17 | f04b216 | M4: Clerk auth foundation — ClerkProvider, sign-in/sign-up pages, site header, guest-first middleware fix (reverted clerk init's default protect-everything scaffold) |
 | 2026-07-17 | 814e03c | Redeploy for Clerk production env vars (dev-mode keys, no prod instance yet) |
 | 2026-07-17 | 1723ffd | M4: save bundles + /my-bundles — Convex↔Clerk auth wired (auth.config, ConvexProviderWithClerk, "convex" JWT template). NOTE: manually-created Clerk JWT templates omit `aud` by default; had to PATCH `aud:"convex"` in or Convex rejects the token (aud mismatch) — the dashboard "Convex" preset sets this automatically, a hand-made template does not |
-| 2026-07-17 | pending | M5 sprint 2 docs closeout |
+| 2026-07-17 | b784591 | M4 docs: mark save-bundles + My-bundles complete |
+| 2026-07-17 | 872c1b7 | docs: monetization strategy (affiliate-first, phased, $0-to-run) → `docs/monetization.md` |
+| 2026-07-17 | ed44b7b | M4: recipient profiles CRUD + "new bundles for X" prefill (`convex/recipientProfiles.ts`, `/profiles`, `src/lib/quiz/prefill.ts`, `src/lib/quiz/options.ts`) |
+| 2026-07-17 | e57bb2e | docs: add `handover.md` single-entry-point session handoff |
+| 2026-07-18 | 074c849…5da29cb | M4 past-bundle memory: pastItemNames schema + internal lookups, prompt avoid-repeating instruction, profileId threaded through quiz state (outside QuizAnswers), generateBundles ownership-verified dedup + profile-folded cache key |
+| 2026-07-18 | pending | docs closeout — M4 past-bundle memory complete |
 
 ---
 

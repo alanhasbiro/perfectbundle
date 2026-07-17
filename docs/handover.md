@@ -49,10 +49,15 @@ detailed docs are linked at the bottom for when you need more than this gives.
 ## 5. Immediate next steps (build, unblocked)
 
 Per `docs/tasks.md` Milestone 4, next unstarted items:
-- Past-bundle memory (dedupe future suggestions per profile)
 - Occasion reminders: CRUD + daily Convex cron (T-14/T-3) → Resend email
 - Popular tab (ranks by `engagementCounters`)
 - Wire the `signup` PostHog event to Clerk's sign-up completion
+
+(Done 2026-07-18: past-bundle memory — `recipientProfiles.pastItemNames` feeds an
+"avoid repeating" prompt instruction; `QuizState.profileId` threads profile→quiz→
+generate, kept out of `QuizAnswers`/cache hash; the generation-cache key folds in
+`profileId` so a stale hit can't skip dedup. See
+`docs/superpowers/plans/2026-07-18-m4-past-bundle-memory.md`.)
 
 ## 6. Deeper reference (read only if this file doesn't answer it)
 
