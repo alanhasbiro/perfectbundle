@@ -7,7 +7,7 @@ const URGENCY_COPY: Record<QuizAnswers["urgency"], string> = {
   no_rush: "There is no rush, so handmade, personalised, or made-to-order items are welcome.",
 };
 
-export function buildBundlePrompt(answers: QuizAnswers): string {
+export function buildBundlePrompt(answers: QuizAnswers, pastItemNames: string[] = []): string {
   const lines: string[] = [];
   lines.push(
     "You are a thoughtful professional gift consultant. Design gift bundles for the following recipient."
@@ -27,6 +27,11 @@ export function buildBundlePrompt(answers: QuizAnswers): string {
       answers.exclusions.length ? answers.exclusions.join(", ") : "none"
     }`
   );
+  if (pastItemNames.length) {
+    lines.push(
+      `- Previously suggested items for this recipient (avoid repeating these or close variants; suggest different ideas): ${pastItemNames.join(", ")}`
+    );
+  }
   lines.push(`- Shopping country: ${answers.country}`);
   lines.push("");
   lines.push("RULES:");
@@ -49,6 +54,11 @@ export function buildBundlePrompt(answers: QuizAnswers): string {
     "6. Apply age-appropriate safety rules: never suggest alcohol, tobacco, or age-restricted items unless the age band is clearly a legal adult for that item in a typical country, and prefer to avoid alcohol entirely unless interests explicitly mention it."
   );
   lines.push("7. Avoid generic, cliché gifts unless they genuinely fit the interests given.");
+  if (pastItemNames.length) {
+    lines.push(
+      "8. Do not repeat any item from the 'previously suggested items' list above, or a near-identical variant of one — this recipient has already been offered those."
+    );
+  }
   lines.push("");
   lines.push("OUTPUT FORMAT:");
   lines.push(

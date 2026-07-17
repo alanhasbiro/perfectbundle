@@ -82,4 +82,17 @@ describe("buildBundlePrompt", () => {
     const p = buildBundlePrompt({ ...answers, freeText: "obsessed with houseplants" });
     expect(p).toContain("obsessed with houseplants");
   });
+
+  it("omits any past-items instruction when none are given", () => {
+    const p = buildBundlePrompt(answers);
+    expect(p.toLowerCase()).not.toContain("previously suggested");
+  });
+
+  it("instructs avoiding previously suggested items when given", () => {
+    const p = buildBundlePrompt(answers, ["Ceramic mug", "French press"]);
+    expect(p).toMatch(/previously suggested/i);
+    expect(p).toContain("Ceramic mug");
+    expect(p).toContain("French press");
+    expect(p).toMatch(/avoid repeating|do not repeat/i);
+  });
 });
