@@ -8,8 +8,8 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Progress** | ~25% (M1 done; M2 quiz wizard sprint complete) |
-| **Current Phase** | M2 Core MVP — quiz wizard done, bundle engine next |
+| **Overall Progress** | ~38% (M1 done; M2 quiz wizard + link builder + bundle engine complete) |
+| **Current Phase** | M2 Core MVP — engine done, results UI next |
 | **On Track?** | ✅ Yes |
 | **Last Updated** | 2026-07-17 |
 | **Last Commit** | see change log |
@@ -21,17 +21,17 @@ See `docs/tasks.md` for the live task list. Summary:
 | Metric | Value |
 |--------|-------|
 | **Active Milestone** | M2 Core MVP |
-| **Tasks Complete** | 12 / ~80 |
+| **Tasks Complete** | 26 / ~80 |
 | **Tasks In Progress** | 0 |
 | **Tasks Blocked** | 0 |
-| **Active Plan** | `docs/superpowers/plans/2026-07-17-m2-quiz-wizard.md` (complete) |
+| **Active Plan** | `docs/superpowers/plans/2026-07-17-m2-link-builder-engine.md` (complete) |
 
 ### Progress by Milestone
 
 | Milestone | Status | Progress | Notes |
 |-----------|--------|----------|-------|
 | 1. Foundation | ✅ Complete | 95% | Live at perfectbundle.vercel.app; PostHog key + Sentry deferred (non-blocking) |
-| 2. Core MVP (P0) | 🔄 In Progress | 20% | Quiz wizard done; bundle engine + links + results + share + trending remain |
+| 2. Core MVP (P0) | 🔄 In Progress | 55% | Quiz, link builder, bundle engine (Gemini, cache, rate limit) all done and live-verified; results UI + share + trending remain |
 | 3. Analytics | ⏳ Not Started | 0% | |
 | 4. Accounts & Retention | ⏳ Not Started | 0% | |
 | 5. Testing & Polish | ⏳ Not Started | 0% | |
@@ -60,7 +60,7 @@ See `docs/tasks.md` for the live task list. Summary:
 ## In Progress 🔄
 
 ### Current Focus
-> M2 quiz wizard shipped: 6-step wizard (occasion→recipient→interests→budget→urgency→exclusions), pure state machine (18 tests), country auto-detect + override, Framer Motion transitions, sessionStorage persistence, analytics events. Ends at `/quiz/results` stub. Next sprint: **bundle engine** — Convex action → Gemini Flash → 3 validated themed bundles consuming `pb.quizAnswers`. Gemini key already in `.env.local`.
+> M2 quiz wizard + link builder + bundle engine all shipped and verified live. The engine (`convex/generateBundles.ts` `generate` action) takes a `QuizAnswers`, checks a hash-keyed cache, rate-limits (10/hr), calls Gemini (`gemini-flash-latest`, JSON-schema mode) with 1 retry, validates with Zod, and persists 3 bundles — confirmed end-to-end with a real Gemini call producing genuinely good, on-budget, exclusion-respecting output. Link builder produces Amazon/Etsy/eBay URLs for 16 countries with affiliate slots ready. Next sprint: **results UI** — wire `/quiz/results` to call `api.generateBundles.generate`, render the 3 bundles with retailer links (`retailer_link_clicked` event), swap/regenerate, and a trending-bundle fallback when the engine returns `failed`/`rate_limited`.
 
 ---
 
@@ -130,7 +130,10 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-17 | 3a90482…0c485fa | Convex agent skills + M1 docs closeout |
 | 2026-07-17 | 34551a9 | M2 quiz wizard sprint plan |
 | 2026-07-17 | 97170ff…d1f1e30 | M2 quiz wizard: state machine, country, shell, 6 steps, routing (TDD, 23 tests) |
-| 2026-07-17 | pending | M2 quiz wizard docs closeout |
+| 2026-07-17 | 7e52b79 | M2 quiz wizard docs closeout |
+| 2026-07-17 | 3ea259b | M2 link builder + bundle engine sprint plan |
+| 2026-07-17 | 9f9aff7…f0e378e | M2 link builder + bundle engine: retailer links, prompt, parser, golden fixtures, hash, Convex generate action (59 tests, verified live) |
+| 2026-07-17 | pending | M2 engine docs closeout |
 
 ---
 

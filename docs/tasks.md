@@ -43,22 +43,24 @@
 - [x] P0 Events: quiz_started, quiz_step_completed, quiz_completed (via src/lib/analytics.ts track())
 - Note: ends at `/quiz/results` stub reading sessionStorage `pb.quizAnswers`; bundle engine sprint consumes it next. Playwright click-through deferred to M5.
 
-### Bundle Engine (F2)
-- [ ] P0 Zod schemas for engine output (bundles → items)
-- [ ] P0 "Gift intelligence" system prompt v1 (coherence, budget respect, exclusions, age rails)
-- [ ] P0 Convex action: quiz → Gemini Flash call → validated JSON (1 retry on invalid)
-- [ ] P0 Generation cache by normalized quiz hash
-- [ ] P0 Per-IP/user rate limiting
-- [ ] P0 Quota-exhausted fallback → trending bundles + friendly message
-- [ ] P0 Golden-fixture eval suite (budget bounds, exclusions, age rails)
-- [ ] P0 Events: bundles_generated, bundle_generation_failed
+### Bundle Engine (F2) — ✅ complete 2026-07-17 (plan: docs/superpowers/plans/2026-07-17-m2-link-builder-engine.md)
+- [x] P0 Zod schemas for engine output (bundles → items) — already existed from M1, reused as-is
+- [x] P0 "Gift intelligence" system prompt v1 (coherence, budget respect, exclusions, age rails) — `src/lib/engine/prompt.ts`
+- [x] P0 Convex action: quiz → Gemini Flash call → validated JSON (1 retry on invalid) — `convex/generateBundles.ts` (`generate` action), model `gemini-flash-latest`
+- [x] P0 Generation cache by normalized quiz hash — `src/lib/quiz/hash.ts` (order-independent FNV-1a) + `convex/generationCache.ts`, verified cache hit on repeat quiz
+- [x] P0 Per-IP/user rate limiting — `convex/rateLimit.ts`, 10/hour fixed window
+- [~] P0 Quota-exhausted fallback → trending bundles + friendly message — engine returns typed `{status:"failed"|"rate_limited"}`; UI wiring to show trending on failure is a results-UI-sprint task
+- [x] P0 Golden-fixture eval suite (budget bounds, exclusions, age rails) — `src/lib/engine/golden-fixtures.test.ts`
+- [x] P0 Events: bundles_generated, bundle_generation_failed — already in `src/lib/analytics.ts` union from M1; fired by results UI next sprint
+- Verified live end-to-end with real Gemini call (2026-07-17): 3 coherent themed bundles, budget respected (£35-53 vs £50 target), "candles" exclusion respected across all 9 items, correct GBP currency.
+- Also added `convex/bundles.ts` `getByIds` query — thin client-callable surface the results UI will use next.
 
-### Link Builder (F3)
-- [ ] P0 Pure function: searchQuery + country → Amazon(TLD map)/Etsy/eBay URLs
-- [ ] P0 Affiliate-tag slots via config (empty for now)
-- [ ] P0 Fast-shipping hint params for high urgency
-- [ ] P0 Exhaustive unit tests (≥15 countries, fallbacks)
-- [ ] P0 Event: retailer_link_clicked
+### Link Builder (F3) — ✅ complete 2026-07-17
+- [x] P0 Pure function: searchQuery + country → Amazon(TLD map)/Etsy/eBay URLs — `src/lib/links/retailer-links.ts`, 16 countries + .com fallback
+- [x] P0 Affiliate-tag slots via config (empty for now) — `AFFILIATE_TAG_AMAZON`/`AFFILIATE_ID_EBAY` env-driven, unset today
+- [x] P0 Fast-shipping hint params for high urgency — Amazon "Get It Fast" refinement param
+- [x] P0 Exhaustive unit tests (≥15 countries, fallbacks) — 16/16 in test suite
+- [ ] P0 Event: retailer_link_clicked — deferred to results UI sprint (link builder itself doesn't fire events; the click handler will)
 
 ### Bundle Results UI (F2/F4)
 - [ ] P0 3-bundle results page: theme, items, "why this fits", est. totals vs budget
