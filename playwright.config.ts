@@ -11,6 +11,10 @@ export default defineConfig({
     baseURL: "http://localhost:3000",
     locale: "en-US", // pins src/lib/quiz/country.ts detection to US/USD for deterministic selectors
     trace: "retain-on-failure",
+    // Exercises the same reduced-motion path real users get (see
+    // src/components/motion-config-provider.tsx) — also avoids axe-core
+    // catching Framer Motion entrance animations mid-transition.
+    contextOptions: { reducedMotion: "reduce" },
   },
   projects: [
     {
