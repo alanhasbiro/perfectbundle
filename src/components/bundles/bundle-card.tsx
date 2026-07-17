@@ -7,6 +7,7 @@ import type { Id } from "../../../convex/_generated/dataModel";
 import { buildRetailerLinks } from "@/lib/links/retailer-links";
 import { classifyBudgetStatus } from "@/lib/bundles/budget-status";
 import { track } from "@/lib/analytics";
+import { SaveButton } from "./save-button";
 import type { BundleContentLike, BundleItemLike } from "./bundle-card-types";
 
 const BUDGET_LABEL: Record<string, string> = {
@@ -62,14 +63,7 @@ export function BundleCard({
         </div>
         {bundleId ? (
           <div className="flex shrink-0 gap-2">
-            <button
-              type="button"
-              title="Sign in to save (coming soon)"
-              disabled
-              className="rounded-full border border-foreground/15 px-3 py-1.5 text-xs opacity-40"
-            >
-              Save
-            </button>
+            <SaveButton bundleId={bundleId} />
             <button
               type="button"
               onClick={handleShare}

@@ -19,6 +19,9 @@ export function SiteHeader() {
           </SignUpButton>
         </Show>
         <Show when="signed-in">
+          <Link href="/my-bundles" className="opacity-70 hover:opacity-100">
+            My bundles
+          </Link>
           <UserButton />
         </Show>
       </div>

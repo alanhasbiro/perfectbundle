@@ -56,6 +56,14 @@ export default defineSchema({
     ttl: v.number(),
   }).index("by_quizHash", ["quizHash"]),
 
+  savedBundles: defineTable({
+    userId: v.string(),
+    bundleId: v.id("bundles"),
+    savedAt: v.number(),
+  })
+    .index("by_user", ["userId"])
+    .index("by_user_bundle", ["userId", "bundleId"]),
+
   engagementCounters: defineTable({
     bundleId: v.string(),
     kind: v.union(v.literal("curated"), v.literal("generated")),
