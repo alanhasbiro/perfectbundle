@@ -8,8 +8,8 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Progress** | ~60% (M1 + M2 P0 done; production Convex deployed; M5 E2E core suite green) |
-| **Current Phase** | M2 + M5-sprint-1 done → M3 Analytics dashboard next (needs owner's PostHog key) |
+| **Overall Progress** | ~65% (M1 + M2 P0 done; production Convex deployed; M5 E2E core + cross-browser + a11y all green) |
+| **Current Phase** | M2 + M5 done (except Lighthouse) → M3/M4 next, both awaiting owner's PostHog/Clerk keys |
 | **On Track?** | ✅ Yes |
 | **Last Updated** | 2026-07-17 |
 | **Last Commit** | see change log |
@@ -20,11 +20,11 @@ See `docs/tasks.md` for the live task list. Summary:
 
 | Metric | Value |
 |--------|-------|
-| **Active Milestone** | M2 (P0 done) + M5 sprint 1 (done) → M3 next |
-| **Tasks Complete** | 42 / ~85 |
+| **Active Milestone** | M2 (P0 done) + M5 (done except Lighthouse) → M3/M4 next |
+| **Tasks Complete** | 44 / ~85 |
 | **Tasks In Progress** | 0 |
-| **Tasks Blocked** | 0 |
-| **Active Plan** | `docs/superpowers/plans/2026-07-17-m5-playwright-e2e.md` (complete) |
+| **Tasks Blocked** | 2 (M3, M4 — owner keys pending) |
+| **Active Plan** | `docs/superpowers/plans/2026-07-17-m5-cross-browser-a11y.md` (complete) |
 
 ### Progress by Milestone
 
@@ -34,7 +34,7 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2. Core MVP (P0) | ✅ Complete | 95% | Quiz, engine, links, results UI, share, trending all done and live-verified. Only deferred: item swap/per-bundle regenerate (P1, needs new engine capability — backlogged) |
 | 3. Analytics | ⏳ Not Started | 0% | Events already fire from M2 work; PostHog dashboard build-out remains (needs owner's PostHog key) |
 | 4. Accounts & Retention | ⏳ Not Started | 0% | Needs owner's Clerk account/keys |
-| 5. Testing & Polish | 🔄 In Progress | 40% | Playwright E2E core happy paths done (8/8 passing: landing, quiz-flow incl. back-nav, trending, share); cross-browser/mobile/Lighthouse/a11y remain |
+| 5. Testing & Polish | 🔄 In Progress | 80% | E2E suite: 41 passing across chromium/firefox/webkit/mobile-chrome (3 intentionally skipped off-chromium — quota control) + baseline a11y audit passing on all 4. Only Lighthouse performance scoring remains |
 | 6. Launch | ⏳ Not Started | 0% | |
 
 ---
@@ -61,6 +61,10 @@ See `docs/tasks.md` for the live task list. Summary:
 - [x] **Production Convex deployment**: `npx convex deploy` → `scintillating-cheetah-642.convex.cloud`, Gemini key set, curated bundles seeded (owner completed `npx convex login`)
 - [x] M5 sprint 1: Playwright E2E installed + configured (auto-starts Convex + Next dev servers, no manual setup); 8 passing specs (landing, quiz back-nav, one full quiz→results completion, trending, share incl. not-found case)
 - [x] Real bug caught and fixed by E2E testing: `submit()` calling `router.push()` inside a `setState` updater (React warning) — fixed in `src/components/quiz/use-quiz.ts`
+- [x] SEO basics: `src/app/robots.ts`, `src/app/sitemap.ts`, landing page OG metadata + `metadataBase`
+- [x] M5 sprint 2: cross-browser (firefox, webkit) + mobile viewport (Pixel 7) Playwright projects; the one real-Gemini test capped to chromium only via `test.skip`
+- [x] Accessibility audit (axe-core): landing, quiz, trending — found and fixed a real WCAG contrast issue (headline fade-in transient low-contrast state); added site-wide `prefers-reduced-motion` support (`src/components/motion-config-provider.tsx`)
+- [x] Convex AI guideline files updated (`npx convex ai-files update`)
 
 ---
 
@@ -71,11 +75,11 @@ See `docs/tasks.md` for the live task list. Summary:
 >
 > Production Convex is now live at `scintillating-cheetah-642.convex.cloud` (Gemini key set, curated bundles seeded). **Owner still needs to** add `NEXT_PUBLIC_CONVEX_URL=https://scintillating-cheetah-642.convex.cloud` to Vercel's Production environment variables — the next push will then deploy a working production site (previously the live site was pointed at a local-only Convex backend Vercel could never reach).
 >
-> Playwright E2E core suite (`npm run test:e2e`) is green: 8/8 passing, self-contained (auto-starts both dev servers), runs serially to avoid interference on the shared local Convex backend. Caught and fixed one real bug along the way (see Completed Items).
+> Playwright E2E suite (`npm run test:e2e`) is green across chromium, firefox, webkit, and mobile-chrome: 41 passed, 3 skipped (the one real-Gemini test intentionally runs on chromium only to conserve free-tier quota). Self-contained — auto-starts both dev servers, no manual setup. Also added a baseline accessibility audit (axe-core) on the three static-ish pages; it caught a real WCAG contrast issue in the landing headline's fade-in animation, which is now fixed with proper site-wide `prefers-reduced-motion` support. SEO basics (robots.txt, sitemap.xml, OG metadata) also done. Caught and fixed two real bugs today via this testing work (see Completed Items).
 >
-> Deferred to backlog (P1, needs new engine capability, not blocking launch): single-item swap and per-bundle regenerate. Also deferred: cross-browser/mobile-viewport Playwright pass, Lighthouse, a11y audit (M5 follow-up sprint).
+> Deferred to backlog (P1, needs new engine capability, not blocking launch): single-item swap and per-bundle regenerate. Only remaining M5 item: Lighthouse performance scoring (separate tooling, lower priority).
 >
-> Next: **Milestone 3** — PostHog proof dashboard per `docs/dashboard-spec.md` (events already fire; needs the owner's PostHog project/key). Then **Milestone 4** (Clerk accounts, saved bundles, profiles, reminders) needs Clerk keys. Both need one small external step from the owner; code not needing those keys can proceed regardless.
+> **Both PostHog and Clerk account creation instructions were given to the owner this session** — M3 (PostHog dashboard) and M4 (Clerk accounts/saved bundles/profiles/reminders) are ready to build the moment those keys land in `.env.local`. Everything else buildable without those keys is now done.
 
 ---
 
@@ -92,13 +96,12 @@ See `docs/tasks.md` for the live task list. Summary:
 ## Next Actions 📋
 
 ### Immediate (Next Commit)
-1. [ ] **Owner:** set `NEXT_PUBLIC_CONVEX_URL=https://scintillating-cheetah-642.convex.cloud` in Vercel Production env vars (unblocks the live site)
-2. [ ] Plan Milestone 3 (Analytics & Proof Dashboard) via `superpowers:writing-plans`
+1. [ ] **Owner:** set `NEXT_PUBLIC_CONVEX_URL=https://scintillating-cheetah-642.convex.cloud` in Vercel Production env vars (unblocks the live site) — if not already done
+2. [ ] **Owner:** PostHog + Clerk account/keys (instructions given this session) — unblocks M3 + M4
+3. [ ] Once keys land: plan Milestone 3 (Analytics dashboard) and Milestone 4 (accounts) via `superpowers:writing-plans`
 
 ### Short-term
-- [ ] Owner: PostHog project → key into Vercel env + `.env.local` (blocks dashboard build-out, not the app itself)
-- [ ] Owner: Clerk account/keys (blocks Milestone 4 accounts work)
-- [ ] M5 follow-up sprint: cross-browser Playwright matrix, mobile viewports, Lighthouse, a11y audit
+- [ ] Lighthouse performance pass (M5, last remaining item, needs separate tooling setup)
 - [ ] Wire E2E suite into GitHub Actions CI once a CI-safe Gemini key/quota strategy is decided
 
 ---
@@ -160,7 +163,11 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-17 | e27e2a7 | M5 Playwright E2E sprint plan |
 | 2026-07-17 | — (CLI) | Production Convex deployed (`scintillating-cheetah-642.convex.cloud`), Gemini key set, curated bundles seeded |
 | 2026-07-17 | 0961590…e49269a | M5 sprint 1: Playwright install/config, testSupport seed mutation, 4 spec files (8 tests), setState-in-render bug fix, serial-workers reliability fix |
-| 2026-07-17 | pending | M5 sprint 1 docs closeout |
+| 2026-07-17 | 618c736 | M5 sprint 1 docs closeout |
+| 2026-07-17 | 8a9cf71 | SEO basics: robots.txt, sitemap.xml, landing OG metadata |
+| 2026-07-17 | eaac2ea | M5 sprint 2 (cross-browser, mobile, a11y) plan |
+| 2026-07-17 | 56d5b2d…ec6c850 | M5 sprint 2: firefox/webkit/mobile-chrome projects, axe-core a11y audit + real reduced-motion fix, Convex AI files updated |
+| 2026-07-17 | pending | M5 sprint 2 docs closeout |
 
 ---
 

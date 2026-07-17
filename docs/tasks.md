@@ -142,9 +142,9 @@
 - [x] P0 Playwright E2E: share flow (create + open public link) — `tests/e2e/share.spec.ts` (seeds via test-only Convex mutation, not a live click-through, to stay fast/deterministic/quota-free)
 - [ ] P1 Playwright E2E: signup → save → profile → regenerate — blocked on M4 (no auth/save/profiles exist yet)
 - [x] P0 Golden-fixture engine suite in CI — `src/lib/engine/golden-fixtures.test.ts` (added M2), runs via `npm test` in GitHub Actions CI
-- [ ] P0 Cross-browser + mobile viewport pass — chromium only so far; firefox/webkit + mobile viewports deferred to a follow-up M5 sprint
-- [ ] P1 Lighthouse ≥90 (performance, a11y) on quiz + results — not yet run
-- [ ] P1 Accessibility audit (keyboard nav, contrast, labels) — not yet run
+- [x] P0 Cross-browser + mobile viewport pass — chromium, firefox, webkit, mobile-chrome (Pixel 7) all covered via `tests/e2e/` (docs/superpowers/plans/2026-07-17-m5-cross-browser-a11y.md); the one Gemini-calling test intentionally runs on chromium only (quota-conscious, `test.skip` on other projects) — 41 passed, 3 skipped
+- [ ] P1 Lighthouse ≥90 (performance, a11y) on quiz + results — still not run; separate tooling/CI setup, deferred
+- [x] P1 Accessibility audit (keyboard nav, contrast, labels) — baseline axe-core scan (serious/critical impact threshold) on landing, quiz, trending, passing across all 4 browser projects. Found and fixed a real WCAG contrast issue: the landing headline's Framer Motion fade-in could render at transiently low contrast — fixed by adding site-wide `prefers-reduced-motion` support (`src/components/motion-config-provider.tsx`)
 - Note: the E2E suite (`npm run test:e2e`) runs locally only — auto-starts both `npx convex dev` and `npm run dev` via Playwright's `webServer` config, no manual two-terminal setup needed. NOT yet wired into GitHub Actions CI (would need a CI-safe Gemini key/quota strategy — deferred).
 - Bug caught by E2E testing and fixed: `submit()` in `src/components/quiz/use-quiz.ts` was calling `router.push()` from inside a `setState` updater, triggering a React warning; fixed by reading state from closure instead.
 
