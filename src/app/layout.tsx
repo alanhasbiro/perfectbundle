@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { MotionConfigProvider } from "@/components/motion-config-provider";
-import { PostHogProvider } from "@/components/posthog-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -41,11 +40,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <PostHogProvider>
-          <MotionConfigProvider>
-            <ConvexClientProvider>{children}</ConvexClientProvider>
-          </MotionConfigProvider>
-        </PostHogProvider>
+        <MotionConfigProvider>
+          <ConvexClientProvider>{children}</ConvexClientProvider>
+        </MotionConfigProvider>
       </body>
     </html>
   );
