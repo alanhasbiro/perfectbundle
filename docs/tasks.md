@@ -35,12 +35,13 @@
 **Timeline:** Weeks 2–4
 **Definition of Done:** Guest can quiz → get 3 bundles → click retailer links → share a bundle; trending page browsable; all on production URL.
 
-### Quiz Wizard (F1)
-- [ ] P0 Quiz state model + step framework (back-nav preserves answers)
-- [ ] P0 Steps: occasion → recipient basics → interests (chips + free text) → budget → urgency → exclusions
-- [ ] P0 Country auto-detect (header/locale) with manual override
-- [ ] P0 Mobile-responsive layout (360px) + Framer Motion transitions
-- [ ] P0 Events: quiz_started, quiz_step_completed, quiz_completed
+### Quiz Wizard (F1) — ✅ complete 2026-07-17 (plan: docs/superpowers/plans/2026-07-17-m2-quiz-wizard.md)
+- [x] P0 Quiz state model + step framework (back-nav preserves answers) — pure `src/lib/quiz/machine.ts`, 18 unit tests
+- [x] P0 Steps: occasion → recipient basics → interests (chips + free text) → budget → urgency → exclusions
+- [x] P0 Country auto-detect (navigator.language/locale) with manual override — `src/lib/quiz/country.ts`
+- [x] P0 Mobile-responsive layout (360px) + Framer Motion transitions
+- [x] P0 Events: quiz_started, quiz_step_completed, quiz_completed (via src/lib/analytics.ts track())
+- Note: ends at `/quiz/results` stub reading sessionStorage `pb.quizAnswers`; bundle engine sprint consumes it next. Playwright click-through deferred to M5.
 
 ### Bundle Engine (F2)
 - [ ] P0 Zod schemas for engine output (bundles → items)

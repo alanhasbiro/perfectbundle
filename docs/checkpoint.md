@@ -8,8 +8,8 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Progress** | ~15% (M1 Foundation complete except PostHog key + Sentry defer) |
-| **Current Phase** | M1 done → M2 Core MVP next |
+| **Overall Progress** | ~25% (M1 done; M2 quiz wizard sprint complete) |
+| **Current Phase** | M2 Core MVP — quiz wizard done, bundle engine next |
 | **On Track?** | ✅ Yes |
 | **Last Updated** | 2026-07-17 |
 | **Last Commit** | see change log |
@@ -20,18 +20,18 @@ See `docs/tasks.md` for the live task list. Summary:
 
 | Metric | Value |
 |--------|-------|
-| **Active Milestone** | M1 Foundation |
-| **Tasks Complete** | 7 / ~80 |
-| **Tasks In Progress** | 1 (Vercel deploy verification) |
+| **Active Milestone** | M2 Core MVP |
+| **Tasks Complete** | 12 / ~80 |
+| **Tasks In Progress** | 0 |
 | **Tasks Blocked** | 0 |
-| **Active Plan** | `docs/superpowers/plans/2026-07-17-m1-foundation.md` |
+| **Active Plan** | `docs/superpowers/plans/2026-07-17-m2-quiz-wizard.md` (complete) |
 
 ### Progress by Milestone
 
 | Milestone | Status | Progress | Notes |
 |-----------|--------|----------|-------|
 | 1. Foundation | ✅ Complete | 95% | Live at perfectbundle.vercel.app; PostHog key + Sentry deferred (non-blocking) |
-| 2. Core MVP (P0) | ⏳ Not Started | 0% | |
+| 2. Core MVP (P0) | 🔄 In Progress | 20% | Quiz wizard done; bundle engine + links + results + share + trending remain |
 | 3. Analytics | ⏳ Not Started | 0% | |
 | 4. Accounts & Retention | ⏳ Not Started | 0% | |
 | 5. Testing & Polish | ⏳ Not Started | 0% | |
@@ -60,7 +60,7 @@ See `docs/tasks.md` for the live task list. Summary:
 ## In Progress 🔄
 
 ### Current Focus
-> M1 complete — https://perfectbundle.vercel.app verified (landing + /quiz). Owner has Gemini API key in .env.local. Next: plan M2 Core MVP (quiz wizard + bundle engine) via `superpowers:writing-plans`. Convex cloud deployment + PostHog key to be set up during M2.
+> M2 quiz wizard shipped: 6-step wizard (occasion→recipient→interests→budget→urgency→exclusions), pure state machine (18 tests), country auto-detect + override, Framer Motion transitions, sessionStorage persistence, analytics events. Ends at `/quiz/results` stub. Next sprint: **bundle engine** — Convex action → Gemini Flash → 3 validated themed bundles consuming `pb.quizAnswers`. Gemini key already in `.env.local`.
 
 ---
 
@@ -127,7 +127,10 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-17 | be63c3e | PRD + full docs scaffold + CLAUDE.md |
 | 2026-07-17 | e1a247b | M1 Foundation plan |
 | 2026-07-17 | 2fbed75…43fc17e | M1 execution: scaffold, Vitest, schemas+seed (TDD), Convex, providers, PostHog, landing, CI |
-| 2026-07-17 | pending | Convex agent skills + M1 docs closeout |
+| 2026-07-17 | 3a90482…0c485fa | Convex agent skills + M1 docs closeout |
+| 2026-07-17 | 34551a9 | M2 quiz wizard sprint plan |
+| 2026-07-17 | 97170ff…d1f1e30 | M2 quiz wizard: state machine, country, shell, 6 steps, routing (TDD, 23 tests) |
+| 2026-07-17 | pending | M2 quiz wizard docs closeout |
 
 ---
 
