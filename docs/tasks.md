@@ -109,6 +109,8 @@
 - [x] P1 "My bundles" page — `/my-bundles`, header link for signed-in users
 - [~] P1 Events: `bundle_saved` fires on save. `signup` event NOT yet wired (Clerk sign-up completion isn't currently tracked → PostHog) — backlog
 
+> **Monetization strategy:** see `docs/monetization.md` (affiliate-first, phased, $0-to-run).
+
 ### Recipient Profiles (F7)
 - [ ] P1 Profile CRUD (name, age, interests, notes)
 - [ ] P1 One-click "new bundles for X" with pre-filled quiz
