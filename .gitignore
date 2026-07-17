@@ -40,3 +40,6 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 !.env.local.example
+
+# stray nested Vite sub-scaffold (not part of this project)
+/PerfectBundle/

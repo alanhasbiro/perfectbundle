@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Convex generated code (committed for CI typechecking, not ours to lint):
     "convex/_generated/**",
+    // Stray untracked Vite sub-scaffold — not part of this project:
+    "PerfectBundle/**",
   ]),
 ]);
 
