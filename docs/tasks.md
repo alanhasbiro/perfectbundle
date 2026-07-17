@@ -156,10 +156,10 @@
 **Timeline:** Week 8
 **Definition of Done:** Public URL, indexed, monitored; launch posts out.
 
-- [ ] P0 Production env vars audit (no secrets client-side)
+- [ ] P0 Production env vars audit (no secrets client-side) — spot-checked during M2/M5 (GEMINI_API_KEY only ever read server-side in Convex actions, never NEXT_PUBLIC_*); full audit still pending before launch
 - [ ] P1 Custom domain (only cost allowed: ~$10/yr domain — optional, can launch on vercel.app for $0)
-- [ ] P0 SEO basics: meta, sitemap, robots; OG images
-- [ ] P0 Uptime monitoring (UptimeRobot free)
+- [x] P0 SEO basics: meta, sitemap, robots; OG images — `src/app/robots.ts`, `src/app/sitemap.ts`, root layout OG metadata + `metadataBase`; share pages already had per-bundle OG tags from M2. (Note: sitemap/OG hardcode `perfectbundle.vercel.app` — update if a custom domain is added later.)
+- [ ] P0 Uptime monitoring (UptimeRobot free) — needs owner's UptimeRobot account
 - [ ] P1 Launch posts (Reddit/X/Product Hunt) with UTM links
 - [ ] P0 48-hour post-launch watch: quota usage, errors, funnel
 

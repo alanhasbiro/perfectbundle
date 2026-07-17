@@ -13,10 +13,19 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const TITLE = "PerfectBundle — gift bundles picked for the person";
+const DESCRIPTION =
+  "Answer a short quiz about them; get themed gift bundles with links to buy every item.";
+
 export const metadata: Metadata = {
-  title: "PerfectBundle — gift bundles picked for the person",
-  description:
-    "Answer a short quiz about them; get themed gift bundles with links to buy every item.",
+  metadataBase: new URL("https://perfectbundle.vercel.app"),
+  title: TITLE,
+  description: DESCRIPTION,
+  openGraph: {
+    title: TITLE,
+    description: DESCRIPTION,
+    type: "website",
+  },
 };
 
 export default function RootLayout({
