@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalMutation, query } from "./_generated/server";
+import { internalMutation, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 
 const bundleItemValidator = v.object({
@@ -65,5 +65,25 @@ export const getByIds = query({
   handler: async (ctx, { ids }) => {
     const docs = await Promise.all(ids.map((id) => ctx.db.get("bundles", id)));
     return docs.filter((d): d is NonNullable<typeof d> => d !== null);
+  },
+});
+
+export const makePublic = mutation({
+  args: { id: v.id("bundles") },
+  handler: async (ctx, { id }) => {
+    // No ownership check: there's no auth system yet (M4). Anyone who generated
+    // a bundle in their own session already has its id and can choose to share
+    // it — this is the same trust model as "anyone with the link" doc sharing.
+    await ctx.db.patch("bundles", id, { isPublic: true });
+    return null;
+  },
+});
+
+export const getPublic = query({
+  args: { id: v.id("bundles") },
+  handler: async (ctx, { id }) => {
+    const doc = await ctx.db.get("bundles", id);
+    if (!doc || !doc.isPublic) return null;
+    return doc;
   },
 });
