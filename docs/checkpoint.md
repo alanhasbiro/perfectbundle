@@ -177,6 +177,7 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-17 | 8c7125d, 226afd2 | M3: fixed PostHog region mismatch (EU not US) in Vercel prod env vars; found+reverted a redundant double-init; confirmed live prod config resolves. Automated event-delivery proof still unresolved — flagged for manual PostHog UI check |
 | 2026-07-17 | f04b216 | M4: Clerk auth foundation — ClerkProvider, sign-in/sign-up pages, site header, guest-first middleware fix (reverted clerk init's default protect-everything scaffold) |
 | 2026-07-17 | 814e03c | Redeploy for Clerk production env vars (dev-mode keys, no prod instance yet) |
+| 2026-07-17 | 1723ffd | M4: save bundles + /my-bundles — Convex↔Clerk auth wired (auth.config, ConvexProviderWithClerk, "convex" JWT template). NOTE: manually-created Clerk JWT templates omit `aud` by default; had to PATCH `aud:"convex"` in or Convex rejects the token (aud mismatch) — the dashboard "Convex" preset sets this automatically, a hand-made template does not |
 | 2026-07-17 | pending | M5 sprint 2 docs closeout |
 
 ---

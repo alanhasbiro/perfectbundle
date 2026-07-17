@@ -105,9 +105,9 @@
 
 ### Auth & Saved Bundles (F7)
 - [x] P1 Clerk integration — email auth live in production (`src/proxy.ts`, `ClerkProvider`, sign-in/sign-up pages, site header). Google OAuth still needs enabling in the Clerk dashboard (Social Connections tab) — not done yet
-- [ ] P1 Save bundle (guest → signup upsell at save action)
-- [ ] P1 "My bundles" page
-- [ ] P1 Events: signup, bundle_saved
+- [x] P1 Save bundle (guest → signup upsell at save action) — `savedBundles` table + Convex CRUD, `SaveButton` opens Clerk modal for guests / toggles for members; Convex↔Clerk auth wired (`convex/auth.config.ts`, `ConvexProviderWithClerk`, "convex" JWT template w/ `aud` claim)
+- [x] P1 "My bundles" page — `/my-bundles`, header link for signed-in users
+- [~] P1 Events: `bundle_saved` fires on save. `signup` event NOT yet wired (Clerk sign-up completion isn't currently tracked → PostHog) — backlog
 
 ### Recipient Profiles (F7)
 - [ ] P1 Profile CRUD (name, age, interests, notes)
