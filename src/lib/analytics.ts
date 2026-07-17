@@ -14,7 +14,13 @@ export type AnalyticsEvent =
   | "bundle_shared"
   | "shared_bundle_viewed"
   | "trending_viewed"
-  | "curated_bundle_opened";
+  | "curated_bundle_opened"
+  // M4 retention branch (canonical in docs/prd.md §2.3)
+  | "signup"
+  | "profile_created"
+  | "reminder_set"
+  | "reminder_email_sent"
+  | "reminder_email_clicked";
 
 export function track(event: AnalyticsEvent, properties?: Record<string, unknown>): void {
   if (!process.env.NEXT_PUBLIC_POSTHOG_KEY) return; // no-op without key

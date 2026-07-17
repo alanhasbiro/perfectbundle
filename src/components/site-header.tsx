@@ -22,6 +22,9 @@ export function SiteHeader() {
           <Link href="/my-bundles" className="opacity-70 hover:opacity-100">
             My bundles
           </Link>
+          <Link href="/profiles" className="opacity-70 hover:opacity-100">
+            Profiles
+          </Link>
           <UserButton />
         </Show>
       </div>

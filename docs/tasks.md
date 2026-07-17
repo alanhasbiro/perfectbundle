@@ -112,10 +112,10 @@
 > **Monetization strategy:** see `docs/monetization.md` (affiliate-first, phased, $0-to-run).
 
 ### Recipient Profiles (F7)
-- [ ] P1 Profile CRUD (name, age, interests, notes)
-- [ ] P1 One-click "new bundles for X" with pre-filled quiz
-- [ ] P1 Past-bundle memory dedupes future suggestions
-- [ ] P1 Event: profile_created
+- [x] P1 Profile CRUD (name, age, interests, notes) — `convex/recipientProfiles.ts` (auth-gated, ownership-checked), `/profiles` page, `ProfileForm` reused for create/edit
+- [x] P1 One-click "new bundles for X" with pre-filled quiz — `src/lib/quiz/prefill.ts` (unit-tested) seeds the same sessionStorage the quiz hydrates from; person-level fields prefilled, occasion/budget/urgency left for the user to redo per gift
+- [ ] P1 Past-bundle memory dedupes future suggestions — not started
+- [x] P1 Event: profile_created fires on save
 
 ### Occasion Reminders (F7)
 - [ ] P1 Reminder CRUD (dates attached to profiles)

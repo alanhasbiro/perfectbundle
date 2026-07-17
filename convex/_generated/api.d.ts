@@ -13,6 +13,7 @@ import type * as curated from "../curated.js";
 import type * as generateBundles from "../generateBundles.js";
 import type * as generationCache from "../generationCache.js";
 import type * as rateLimit from "../rateLimit.js";
+import type * as recipientProfiles from "../recipientProfiles.js";
 import type * as savedBundles from "../savedBundles.js";
 import type * as seed from "../seed.js";
 import type * as seedData from "../seedData.js";
@@ -30,6 +31,7 @@ declare const fullApi: ApiFromModules<{
   generateBundles: typeof generateBundles;
   generationCache: typeof generationCache;
   rateLimit: typeof rateLimit;
+  recipientProfiles: typeof recipientProfiles;
   savedBundles: typeof savedBundles;
   seed: typeof seed;
   seedData: typeof seedData;

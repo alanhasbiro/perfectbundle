@@ -2,28 +2,8 @@
 
 import { StepShell } from "../step-shell";
 import { ChoiceChip } from "../choice-chip";
+import { INTERESTS } from "@/lib/quiz/options";
 import type { StepProps } from "../quiz-wizard";
-
-const INTERESTS = [
-  "Cooking",
-  "Coffee & tea",
-  "Reading",
-  "Gaming",
-  "Fitness",
-  "Outdoors & hiking",
-  "Gardening",
-  "Music",
-  "Art & crafts",
-  "Tech & gadgets",
-  "Beauty & skincare",
-  "Fashion",
-  "Travel",
-  "Pets",
-  "Home & cozy",
-  "Sports",
-  "Movies & TV",
-  "Wellness",
-];
 
 export function InterestsStep({ state, patch }: StepProps) {
   const toggle = (interest: string) => {

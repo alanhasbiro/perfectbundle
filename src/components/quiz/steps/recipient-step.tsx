@@ -3,21 +3,8 @@
 import { StepShell } from "../step-shell";
 import { ChoiceChip } from "../choice-chip";
 import { COUNTRIES, currencyForCountry } from "@/lib/quiz/country";
+import { AGE_BANDS, RELATIONSHIPS, GENDERS } from "@/lib/quiz/options";
 import type { StepProps } from "../quiz-wizard";
-
-const AGE_BANDS = ["0-12", "13-17", "18-24", "25-34", "35-44", "45-54", "55-64", "65+"];
-const RELATIONSHIPS = [
-  "Partner",
-  "Friend",
-  "Mum",
-  "Dad",
-  "Sibling",
-  "Child",
-  "Grandparent",
-  "Colleague",
-  "Other",
-];
-const GENDERS = ["Female", "Male", "Prefer not to say"];
 
 export function RecipientStep({ state, patch }: StepProps) {
   return (

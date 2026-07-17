@@ -64,6 +64,17 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_bundle", ["userId", "bundleId"]),
 
+  recipientProfiles: defineTable({
+    userId: v.string(),
+    name: v.string(),
+    relationship: v.string(),
+    ageBand: v.string(),
+    gender: v.optional(v.string()),
+    interests: v.array(v.string()),
+    notes: v.optional(v.string()),
+    createdAt: v.number(),
+  }).index("by_user", ["userId"]),
+
   engagementCounters: defineTable({
     bundleId: v.string(),
     kind: v.union(v.literal("curated"), v.literal("generated")),

@@ -17,8 +17,10 @@ import {
 import { detectCountry, currencyForCountry } from "@/lib/quiz/country";
 import { track } from "@/lib/analytics";
 
-const STATE_KEY = "pb.quizState";
-const STARTED_KEY = "pb.quizStartedAt";
+// Exported so the recipient-profiles "New bundles for X" flow can pre-seed the
+// same storage the quiz hydrates from (keys must stay in one place).
+export const STATE_KEY = "pb.quizState";
+export const STARTED_KEY = "pb.quizStartedAt";
 const ANSWERS_KEY = "pb.quizAnswers";
 
 function loadInitial(): { state: QuizState; fresh: boolean } {
