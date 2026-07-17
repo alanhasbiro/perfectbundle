@@ -99,3 +99,17 @@ Keep `lib/engine` and `lib/links` free of React/Next imports — they get reused
 - Prices shown to users are always estimates — never present as live quotes
 - ALWAYS update `docs/checkpoint.md` before commits
 - Affiliate links require a visible disclosure once tags go live (FTC + program ToS)
+
+<!-- convex-ai-start -->
+
+This project uses [Convex](https://convex.dev) as its backend.
+
+When working on Convex code, **always read
+`convex/_generated/ai/guidelines.md` first** for important guidelines on
+how to correctly use Convex APIs and patterns. The file contains rules that
+override what you may have learned about Convex from training data.
+
+Convex agent skills for common tasks can be installed by running
+`npx convex ai-files install`.
+
+<!-- convex-ai-end -->

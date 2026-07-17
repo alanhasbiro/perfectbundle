@@ -8,11 +8,11 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Progress** | 2% (docs bootstrap complete, no code yet) |
-| **Current Phase** | Pre-M1 (Foundation not started) |
+| **Overall Progress** | ~12% (M1 Foundation ~85% — code complete, deploy verification pending) |
+| **Current Phase** | M1 Foundation (closing out) |
 | **On Track?** | ✅ Yes |
 | **Last Updated** | 2026-07-17 |
-| **Last Commit** | pending (scaffold commit) |
+| **Last Commit** | see change log |
 
 ### Tasks Status
 
@@ -20,17 +20,17 @@ See `docs/tasks.md` for the live task list. Summary:
 
 | Metric | Value |
 |--------|-------|
-| **Active Milestone** | M1 Foundation (next up) |
-| **Tasks Complete** | 0 / ~80 |
-| **Tasks In Progress** | 0 |
+| **Active Milestone** | M1 Foundation |
+| **Tasks Complete** | 7 / ~80 |
+| **Tasks In Progress** | 1 (Vercel deploy verification) |
 | **Tasks Blocked** | 0 |
-| **Active Plan** | none yet — first plan via `superpowers:writing-plans` |
+| **Active Plan** | `docs/superpowers/plans/2026-07-17-m1-foundation.md` |
 
 ### Progress by Milestone
 
 | Milestone | Status | Progress | Notes |
 |-----------|--------|----------|-------|
-| 1. Foundation | ⏳ Not Started | 0% | Next up |
+| 1. Foundation | 🔄 In Progress | 85% | Code + tests + CI done; Vercel URL verification + PostHog key remain |
 | 2. Core MVP (P0) | ⏳ Not Started | 0% | |
 | 3. Analytics | ⏳ Not Started | 0% | |
 | 4. Accounts & Retention | ⏳ Not Started | 0% | |
@@ -46,13 +46,21 @@ See `docs/tasks.md` for the live task list. Summary:
 - [x] PRD written → `docs/prd.md`
 - [x] Scaffold docs: `docs/tasks.md`, `docs/planning.md`, `docs/checkpoint.md`, `CLAUDE.md`, `docs/data-schema.md`, `docs/dashboard-spec.md`
 - [x] Git repo initialized
+- [x] M1 plan written → `docs/superpowers/plans/2026-07-17-m1-foundation.md`
+- [x] Next.js 16 scaffold (App Router, TS, Tailwind) — build green
+- [x] Vitest infra; Zod bundle schemas + 5 seed bundles (TDD, 6/6 tests)
+- [x] Convex: schema pushed to local dev deployment, seed idempotent, `curated:listApproved` verified
+- [x] Env-gated Convex provider + PostHog init + typed `track()` (builds with zero env vars)
+- [x] Landing page shell + `/quiz` placeholder (Framer Motion)
+- [x] GitHub Actions CI; pushed to github.com/alanhasbiro/perfectbundle
+- [x] Convex agent skills installed (`.claude/skills/convex-*`)
 
 ---
 
 ## In Progress 🔄
 
 ### Current Focus
-> Project bootstrap. Next: write the M1 Foundation sprint plan (`superpowers:writing-plans`), then scaffold Next.js + Convex.
+> Closing out M1: verify Vercel production URL renders; owner to create PostHog project + set `NEXT_PUBLIC_POSTHOG_KEY` in Vercel. Then plan M2 (quiz wizard + bundle engine) via `superpowers:writing-plans`.
 
 ---
 
@@ -69,12 +77,13 @@ See `docs/tasks.md` for the live task list. Summary:
 ## Next Actions 📋
 
 ### Immediate (Next Commit)
-1. [ ] Write M1 Foundation plan via `superpowers:writing-plans`
-2. [ ] Scaffold Next.js + Convex per plan
+1. [ ] Verify Vercel production URL (landing + /quiz render)
+2. [ ] Owner: PostHog project → key into Vercel env + `.env.local`
 
 ### Short-term
-- [ ] M1 Foundation tasks (see `docs/tasks.md`)
-- [ ] Create free-tier accounts: Convex, Vercel, PostHog, Gemini API key
+- [ ] Plan M2 Core MVP (quiz wizard first) via `superpowers:writing-plans`
+- [ ] Owner: Gemini API key (needed for M2 engine)
+- [ ] Convex cloud deployment (currently local-only; needed before production data)
 
 ---
 
@@ -116,7 +125,10 @@ See `docs/tasks.md` for the live task list. Summary:
 | Date | Commit | Summary |
 |------|--------|---------|
 | 2026-07-17 | 8f6a935 | Design spec from brainstorming |
-| 2026-07-17 | pending | PRD + full docs scaffold + CLAUDE.md |
+| 2026-07-17 | be63c3e | PRD + full docs scaffold + CLAUDE.md |
+| 2026-07-17 | e1a247b | M1 Foundation plan |
+| 2026-07-17 | 2fbed75…43fc17e | M1 execution: scaffold, Vitest, schemas+seed (TDD), Convex, providers, PostHog, landing, CI |
+| 2026-07-17 | pending | Convex agent skills + M1 docs closeout |
 
 ---
 

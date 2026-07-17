@@ -14,17 +14,17 @@
 **Definition of Done:** Next.js + Convex app deploys to Vercel; schema live; PostHog capturing page views; CI green.
 
 ### Setup & Infrastructure
-- [ ] P0 Scaffold Next.js (App Router, TypeScript, Tailwind) in repo
-- [ ] P0 Add Convex; connect dev deployment; env var handling documented
-- [ ] P0 Deploy skeleton to Vercel (hobby tier), verify production build
-- [ ] P0 GitHub repo + GitHub Actions CI (typecheck, lint, unit tests)
-- [ ] P0 Install Framer Motion, Zod, PostHog JS
-- [ ] P1 Error tracking via Sentry free tier (or Vercel logs initially)
+- [x] P0 Scaffold Next.js (App Router, TypeScript, Tailwind) in repo
+- [x] P0 Add Convex; connect dev deployment; env var handling documented (local dev deployment; cloud deployment at M2/M6)
+- [~] P0 Deploy skeleton to Vercel (hobby tier), verify production build (owner connected Vercel; production URL verification pending)
+- [x] P0 GitHub repo + GitHub Actions CI (typecheck, lint, unit tests)
+- [x] P0 Install Framer Motion, Zod, PostHog JS
+- [ ] P1 Error tracking via Sentry free tier (or Vercel logs initially) — deferred, Vercel logs for now
 
 ### Database & Schema
-- [ ] P0 Define Convex schema: bundles, curatedBundles, generationCache, engagementCounters, rateLimits (see docs/data-schema.md)
-- [ ] P0 Seed script: 5 sample curated bundles for dev
-- [ ] P0 PostHog project created; `page_view` with UTM capture verified
+- [x] P0 Define Convex schema: bundles, curatedBundles, generationCache, engagementCounters, rateLimits (see docs/data-schema.md)
+- [x] P0 Seed script: 5 sample curated bundles for dev (idempotent, verified on local deployment)
+- [ ] P0 PostHog project created; `page_view` with UTM capture verified (code in place, env-gated; owner to create PostHog project + set key in Vercel)
 
 **Dependencies:** None
 **Blockers to watch:** none known
