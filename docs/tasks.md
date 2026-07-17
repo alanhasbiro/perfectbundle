@@ -104,7 +104,7 @@
 **Definition of Done:** Sign up, save, profiles, reminders all work in production; Popular tab live.
 
 ### Auth & Saved Bundles (F7)
-- [ ] P1 Clerk integration (Google + email)
+- [x] P1 Clerk integration — email auth live in production (`src/proxy.ts`, `ClerkProvider`, sign-in/sign-up pages, site header). Google OAuth still needs enabling in the Clerk dashboard (Social Connections tab) — not done yet
 - [ ] P1 Save bundle (guest → signup upsell at save action)
 - [ ] P1 "My bundles" page
 - [ ] P1 Events: signup, bundle_saved

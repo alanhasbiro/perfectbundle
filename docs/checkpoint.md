@@ -33,7 +33,7 @@ See `docs/tasks.md` for the live task list. Summary:
 | 1. Foundation | ✅ Complete | 100% | Live at perfectbundle.vercel.app; **production Convex deployed** (was local-only, fixed this session); PostHog key + Sentry still deferred (non-blocking) |
 | 2. Core MVP (P0) | ✅ Complete | 95% | Quiz, engine, links, results UI, share, trending all done and live-verified. Only deferred: item swap/per-bundle regenerate (P1, needs new engine capability — backlogged) |
 | 3. Analytics | 🔄 In Progress | 25% | Fixed real bugs: PostHog project is on EU cloud but key/host in Vercel were wrong region (401s) — corrected and redeployed; confirmed `config.js` resolves 200 in production. Could NOT get a definitive automated (Playwright) confirmation that `posthog.capture()` reaches the network in this dev/build setup despite extensive debugging (SDK inits fine, consent optedIn, direct HTTP capture works) — needs one manual check: visit perfectbundle.vercel.app, then check PostHog → Activity → Events a few minutes later. Dashboard/funnel/attribution insights (P0) still need manual PostHog UI setup — no personal API key available to automate |
-| 4. Accounts & Retention | 🔄 Starting | 0% | Clerk keys received this session; Clerk CLI setup in progress |
+| 4. Accounts & Retention | 🔄 In Progress | 20% | Clerk installed, `ClerkProvider` wired, sign-in/sign-up pages + site header (sign in/up/UserButton) live in production and verified. Caught+fixed a real issue: `clerk init`'s default `proxy.ts` protected every route — reverted to guest-first (only save/profile routes will gate later). Using Clerk **dev-mode keys** in production (no prod instance yet — needs a custom domain or manual dashboard step first); fine for current low-traffic stage but has stricter rate limits. Still to build: save bundle + guest→signup upsell, "My bundles" page, recipient profiles, reminders |
 | 5. Testing & Polish | 🔄 In Progress | 80% | E2E suite: 41 passing across chromium/firefox/webkit/mobile-chrome (3 intentionally skipped off-chromium — quota control) + baseline a11y audit passing on all 4. Only Lighthouse performance scoring remains |
 | 6. Launch | ⏳ Not Started | 0% | |
 
@@ -98,7 +98,9 @@ See `docs/tasks.md` for the live task list. Summary:
 ### Immediate (Next Commit)
 1. [ ] **Owner:** visit perfectbundle.vercel.app, then check PostHog → Activity → Events to confirm events are actually landing (couldn't get automated proof — see M3 row above)
 2. [ ] Build M3 dashboard/funnel/attribution insights in PostHog UI (manual, ~10 min, no API access available to automate)
-3. [ ] Continue M4 Clerk setup (CLI install, auth, init, auth UI)
+3. [ ] **Owner:** try signing up as the first test user at perfectbundle.vercel.app to confirm the Clerk flow works end to end
+4. [ ] Build M4: save bundle action (guest→signup upsell), "My bundles" page, recipient profiles CRUD, occasion reminders
+5. [ ] When ready to leave Clerk dev-mode: create a production instance in the Clerk dashboard (needs a verified custom domain) and re-run `clerk env pull --instance prod`
 
 ### Short-term
 - [ ] Lighthouse performance pass (M5, last remaining item, needs separate tooling setup)
@@ -171,7 +173,9 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-17 | eaac2ea | M5 sprint 2 (cross-browser, mobile, a11y) plan |
 | 2026-07-17 | 56d5b2d…ec6c850 | M5 sprint 2: firefox/webkit/mobile-chrome projects, axe-core a11y audit + real reduced-motion fix, Convex AI files updated |
 | 2026-07-17 | 8c7125d, 226afd2 | M3: fixed PostHog region mismatch (EU not US) in Vercel prod env vars; found+reverted a redundant double-init; confirmed live prod config resolves. Automated event-delivery proof still unresolved — flagged for manual PostHog UI check |
-| 2026-07-17 | pending | M5 sprint 2 docs closeout; M4 Clerk setup starting |
+| 2026-07-17 | f04b216 | M4: Clerk auth foundation — ClerkProvider, sign-in/sign-up pages, site header, guest-first middleware fix (reverted clerk init's default protect-everything scaffold) |
+| 2026-07-17 | 814e03c | Redeploy for Clerk production env vars (dev-mode keys, no prod instance yet) |
+| 2026-07-17 | pending | M5 sprint 2 docs closeout |
 
 ---
 
