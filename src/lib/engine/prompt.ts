@@ -1,5 +1,5 @@
 // NOTE: keep this file free of React/Next imports — reused by mobile later.
-import type { QuizAnswers } from "@/lib/quiz/types";
+import type { QuizAnswers } from "../quiz/types";
 
 const URGENCY_COPY: Record<QuizAnswers["urgency"], string> = {
   fast: "This is needed SOON, so favour widely-available items over slow handmade goods.",

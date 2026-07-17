@@ -1,0 +1,157 @@
+import { v } from "convex/values";
+import { action } from "./_generated/server";
+import { internal } from "./_generated/api";
+import type { Id } from "./_generated/dataModel";
+import { buildBundlePrompt } from "../src/lib/engine/prompt";
+import { parseBundleResponse } from "../src/lib/engine/parse-response";
+import { hashQuizAnswers } from "../src/lib/quiz/hash";
+import type { QuizAnswers } from "../src/lib/quiz/types";
+
+// Gemini free-tier Flash model. "gemini-flash-latest" is Google's rolling alias
+// for the current-generation Flash model (verified live 2026-07-17, resolved to
+// gemini-3.5-flash) — this stays current without code changes as Google upgrades
+// it. If generations start failing with a 404 "model not found", check
+// https://ai.google.dev/gemini-api/docs/models and pin an explicit version here.
+export const GEMINI_MODEL = "gemini-flash-latest";
+
+const RATE_LIMIT_MAX = 10;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+const quizValidator = v.object({
+  occasion: v.string(),
+  ageBand: v.string(),
+  gender: v.optional(v.string()),
+  relationship: v.string(),
+  interests: v.array(v.string()),
+  freeText: v.optional(v.string()),
+  budget: v.number(),
+  currency: v.string(),
+  urgency: v.union(v.literal("fast"), v.literal("normal"), v.literal("no_rush")),
+  exclusions: v.array(v.string()),
+  country: v.string(),
+});
+
+export type GenerateResult =
+  | { status: "ok"; bundleIds: Id<"bundles">[]; cacheHit: boolean }
+  | { status: "rate_limited" }
+  | { status: "failed"; reason: string };
+
+// fetch() is available in Convex's default runtime — no "use node" needed here,
+// and this file must not export queries/mutations alongside a node runtime anyway.
+async function callGemini(prompt: string): Promise<string | null> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) return null;
+
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "ARRAY",
+        items: {
+          type: "OBJECT",
+          properties: {
+            theme: { type: "STRING" },
+            rationale: { type: "STRING" },
+            estTotal: { type: "STRING" },
+            items: {
+              type: "ARRAY",
+              items: {
+                type: "OBJECT",
+                properties: {
+                  name: { type: "STRING" },
+                  description: { type: "STRING" },
+                  why: { type: "STRING" },
+                  estPriceRange: { type: "STRING" },
+                  searchQuery: { type: "STRING" },
+                  tags: { type: "ARRAY", items: { type: "STRING" } },
+                },
+                required: ["name", "description", "why", "estPriceRange", "searchQuery", "tags"],
+              },
+            },
+          },
+          required: ["theme", "rationale", "estTotal", "items"],
+        },
+      },
+    },
+  };
+
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+      body: JSON.stringify(body),
+    });
+  } catch {
+    return null; // network failure — treated as a clean generation failure upstream
+  }
+
+  if (!res.ok) return null;
+  const json = (await res.json()) as {
+    candidates?: { content?: { parts?: { text?: string }[] } }[];
+  };
+  return json.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
+}
+
+// Client-callable entry point for the results UI (next sprint). Everything lives
+// in one `action` (rather than an internalAction + wrapper) because it doesn't
+// need to cross runtimes — fetch() works in the default runtime — and per the
+// Convex guidelines, action-to-action calls should be avoided when a plain
+// helper function (this one) will do.
+export const generate = action({
+  args: { quiz: quizValidator, rateLimitKey: v.string() },
+  handler: async (ctx, args): Promise<GenerateResult> => {
+    const quiz = args.quiz as QuizAnswers;
+
+    const allowed: boolean = await ctx.runMutation(internal.rateLimit.checkAndConsume, {
+      key: args.rateLimitKey,
+      max: RATE_LIMIT_MAX,
+      windowMs: RATE_LIMIT_WINDOW_MS,
+    });
+    if (!allowed) return { status: "rate_limited" };
+
+    const quizHash = hashQuizAnswers(quiz);
+
+    const cached = await ctx.runQuery(internal.generationCache.getFresh, {
+      quizHash,
+      maxAgeMs: CACHE_TTL_MS,
+    });
+    if (cached) return { status: "ok", bundleIds: cached.bundleIds, cacheHit: true };
+
+    const prompt = buildBundlePrompt(quiz);
+
+    let raw = await callGemini(prompt);
+    let parsed = raw
+      ? parseBundleResponse(raw)
+      : ({ ok: false, error: "No response from Gemini" } as const);
+
+    if (!parsed.ok) {
+      // One retry on invalid/unparseable JSON, per docs/prd.md F2.
+      raw = await callGemini(prompt);
+      parsed = raw
+        ? parseBundleResponse(raw)
+        : ({ ok: false, error: "No response from Gemini (retry)" } as const);
+    }
+
+    if (!parsed.ok) {
+      return { status: "failed", reason: parsed.error };
+    }
+
+    const bundleIds: Id<"bundles">[] = await ctx.runMutation(internal.bundles.storeGenerated, {
+      quizHash,
+      quiz,
+      bundles: parsed.bundles,
+    });
+
+    await ctx.runMutation(internal.generationCache.store, {
+      quizHash,
+      bundleIds,
+      ttl: CACHE_TTL_MS,
+    });
+
+    return { status: "ok", bundleIds, cacheHit: false };
+  },
+});

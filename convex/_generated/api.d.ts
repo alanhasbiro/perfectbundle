@@ -8,7 +8,11 @@
  * @module
  */
 
+import type * as bundles from "../bundles.js";
 import type * as curated from "../curated.js";
+import type * as generateBundles from "../generateBundles.js";
+import type * as generationCache from "../generationCache.js";
+import type * as rateLimit from "../rateLimit.js";
 import type * as seed from "../seed.js";
 import type * as seedData from "../seedData.js";
 
@@ -19,7 +23,11 @@ import type {
 } from "convex/server";
 
 declare const fullApi: ApiFromModules<{
+  bundles: typeof bundles;
   curated: typeof curated;
+  generateBundles: typeof generateBundles;
+  generationCache: typeof generationCache;
+  rateLimit: typeof rateLimit;
   seed: typeof seed;
   seedData: typeof seedData;
 }>;

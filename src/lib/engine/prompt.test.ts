@@ -1,6 +1,6 @@
 import { describe, it, expect } from "vitest";
 import { buildBundlePrompt } from "./prompt";
-import type { QuizAnswers } from "@/lib/quiz/types";
+import type { QuizAnswers } from "../quiz/types";
 
 const answers: QuizAnswers = {
   occasion: "Birthday",
