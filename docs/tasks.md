@@ -138,15 +138,17 @@
 **Timeline:** Week 7
 **Definition of Done:** Playwright E2E ≥95% pass; golden fixtures green; Lighthouse ≥90 mobile.
 
-- [ ] P0 Playwright E2E: quiz → bundles → link click
-- [ ] P0 Playwright E2E: share flow (create + open public link)
-- [ ] P1 Playwright E2E: signup → save → profile → regenerate
-- [ ] P0 Golden-fixture engine suite in CI
-- [ ] P0 Cross-browser + mobile viewport pass
-- [ ] P1 Lighthouse ≥90 (performance, a11y) on quiz + results
-- [ ] P1 Accessibility audit (keyboard nav, contrast, labels)
+- [x] P0 Playwright E2E: quiz → bundles → link click — `tests/e2e/quiz-flow.spec.ts` (docs/superpowers/plans/2026-07-17-m5-playwright-e2e.md), 8/8 passing
+- [x] P0 Playwright E2E: share flow (create + open public link) — `tests/e2e/share.spec.ts` (seeds via test-only Convex mutation, not a live click-through, to stay fast/deterministic/quota-free)
+- [ ] P1 Playwright E2E: signup → save → profile → regenerate — blocked on M4 (no auth/save/profiles exist yet)
+- [x] P0 Golden-fixture engine suite in CI — `src/lib/engine/golden-fixtures.test.ts` (added M2), runs via `npm test` in GitHub Actions CI
+- [ ] P0 Cross-browser + mobile viewport pass — chromium only so far; firefox/webkit + mobile viewports deferred to a follow-up M5 sprint
+- [ ] P1 Lighthouse ≥90 (performance, a11y) on quiz + results — not yet run
+- [ ] P1 Accessibility audit (keyboard nav, contrast, labels) — not yet run
+- Note: the E2E suite (`npm run test:e2e`) runs locally only — auto-starts both `npx convex dev` and `npm run dev` via Playwright's `webServer` config, no manual two-terminal setup needed. NOT yet wired into GitHub Actions CI (would need a CI-safe Gemini key/quota strategy — deferred).
+- Bug caught by E2E testing and fixed: `submit()` in `src/components/quiz/use-quiz.ts` was calling `router.push()` from inside a `setState` updater, triggering a React warning; fixed by reading state from closure instead.
 
-**Dependencies:** Milestones 1–4
+**Dependencies:** Milestones 1–4 (M4 items above excepted, correctly still pending)
 
 ---
 
@@ -168,6 +170,7 @@
 ## Backlog (Future Phases)
 - [ ] P1 Single-item swap ("show me another") — needs engine support for regenerating one bundle slot (new prompt variant scoped to a single item + existing bundle context); deferred from M2 results UI sprint
 - [ ] P1 Per-bundle regenerate (distinct from whole-quiz "Start over") — same engine dependency as item swap
+- [ ] P2 `<BundleCard>` shows curated bundles' `theme` (descriptive tagline) as its heading, not the catchier admin-facing `title` field (e.g. "Slow coffee mornings" instead of "The Coffee Ritual") — found via E2E test writing; minor polish, not a functional bug (generated bundles have no separate title field, so this is consistent behavior, just not the punchiest copy for curated/trending)
 - [ ] P2 eBay Browse API: live prices/deals where available
 - [ ] P2 Engine learning from click data (boost item types that get clicks)
 - [ ] P2 React Native (Expo) iOS/Android apps sharing Convex backend
