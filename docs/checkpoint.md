@@ -8,8 +8,8 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Progress** | ~12% (M1 Foundation ~85% — code complete, deploy verification pending) |
-| **Current Phase** | M1 Foundation (closing out) |
+| **Overall Progress** | ~15% (M1 Foundation complete except PostHog key + Sentry defer) |
+| **Current Phase** | M1 done → M2 Core MVP next |
 | **On Track?** | ✅ Yes |
 | **Last Updated** | 2026-07-17 |
 | **Last Commit** | see change log |
@@ -30,7 +30,7 @@ See `docs/tasks.md` for the live task list. Summary:
 
 | Milestone | Status | Progress | Notes |
 |-----------|--------|----------|-------|
-| 1. Foundation | 🔄 In Progress | 85% | Code + tests + CI done; Vercel URL verification + PostHog key remain |
+| 1. Foundation | ✅ Complete | 95% | Live at perfectbundle.vercel.app; PostHog key + Sentry deferred (non-blocking) |
 | 2. Core MVP (P0) | ⏳ Not Started | 0% | |
 | 3. Analytics | ⏳ Not Started | 0% | |
 | 4. Accounts & Retention | ⏳ Not Started | 0% | |
@@ -60,7 +60,7 @@ See `docs/tasks.md` for the live task list. Summary:
 ## In Progress 🔄
 
 ### Current Focus
-> Closing out M1: verify Vercel production URL renders; owner to create PostHog project + set `NEXT_PUBLIC_POSTHOG_KEY` in Vercel. Then plan M2 (quiz wizard + bundle engine) via `superpowers:writing-plans`.
+> M1 complete — https://perfectbundle.vercel.app verified (landing + /quiz). Owner has Gemini API key in .env.local. Next: plan M2 Core MVP (quiz wizard + bundle engine) via `superpowers:writing-plans`. Convex cloud deployment + PostHog key to be set up during M2.
 
 ---
 
@@ -77,13 +77,12 @@ See `docs/tasks.md` for the live task list. Summary:
 ## Next Actions 📋
 
 ### Immediate (Next Commit)
-1. [ ] Verify Vercel production URL (landing + /quiz render)
-2. [ ] Owner: PostHog project → key into Vercel env + `.env.local`
+1. [ ] Plan M2 Core MVP via `superpowers:writing-plans` (quiz wizard → engine → links → results)
 
 ### Short-term
-- [ ] Plan M2 Core MVP (quiz wizard first) via `superpowers:writing-plans`
-- [ ] Owner: Gemini API key (needed for M2 engine)
-- [ ] Convex cloud deployment (currently local-only; needed before production data)
+- [ ] M2 execution: quiz wizard, bundle engine (Gemini), link builder, results UI
+- [ ] Owner: PostHog project → key into Vercel env + `.env.local`
+- [ ] Convex cloud: `npx convex login` + `npx convex deploy` (needed before production data; local dev fine meanwhile)
 
 ---
 

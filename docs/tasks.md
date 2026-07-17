@@ -16,7 +16,7 @@
 ### Setup & Infrastructure
 - [x] P0 Scaffold Next.js (App Router, TypeScript, Tailwind) in repo
 - [x] P0 Add Convex; connect dev deployment; env var handling documented (local dev deployment; cloud deployment at M2/M6)
-- [~] P0 Deploy skeleton to Vercel (hobby tier), verify production build (owner connected Vercel; production URL verification pending)
+- [x] P0 Deploy skeleton to Vercel (hobby tier), verify production build (live: https://perfectbundle.vercel.app — landing + /quiz verified 2026-07-17)
 - [x] P0 GitHub repo + GitHub Actions CI (typecheck, lint, unit tests)
 - [x] P0 Install Framer Motion, Zod, PostHog JS
 - [ ] P1 Error tracking via Sentry free tier (or Vercel logs initially) — deferred, Vercel logs for now
