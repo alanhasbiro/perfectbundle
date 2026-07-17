@@ -77,21 +77,23 @@ export function useQuiz() {
   }, []);
 
   const submit = useCallback(() => {
-    setState((s) => {
-      if (!s) return s;
-      const answers = toQuizAnswers(s);
-      if (!answers) return s;
-      track("quiz_step_completed", { step: currentStep(s) });
-      const startedAt = Number(sessionStorage.getItem(STARTED_KEY) ?? Date.now());
-      track("quiz_completed", {
-        duration_s: Math.round((Date.now() - startedAt) / 1000),
-      });
-      sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(answers));
-      sessionStorage.removeItem(STATE_KEY);
-      router.push("/quiz/results");
-      return s;
+    // No state mutation happens here (the quiz is done) — read `state` directly
+    // from closure rather than going through a setState updater. Calling
+    // router.push() from inside a setState updater triggers React's "cannot
+    // update a component while rendering a different component" warning,
+    // since the updater can run during the render phase.
+    if (!state) return;
+    const answers = toQuizAnswers(state);
+    if (!answers) return;
+    track("quiz_step_completed", { step: currentStep(state) });
+    const startedAt = Number(sessionStorage.getItem(STARTED_KEY) ?? Date.now());
+    track("quiz_completed", {
+      duration_s: Math.round((Date.now() - startedAt) / 1000),
     });
-  }, [router]);
+    sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(answers));
+    sessionStorage.removeItem(STATE_KEY);
+    router.push("/quiz/results");
+  }, [state, router]);
 
   const step = state ? currentStep(state) : QUIZ_STEPS[0];
   const canGoNext = state ? canAdvance(state) : false;
