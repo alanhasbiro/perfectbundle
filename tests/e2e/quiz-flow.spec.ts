@@ -42,7 +42,13 @@ test.describe("quiz back-navigation", () => {
 });
 
 test.describe("quiz full completion", () => {
-  test("completing all 6 steps reaches a usable results page", async ({ page }) => {
+  test("completing all 6 steps reaches a usable results page", async ({ page }, testInfo) => {
+    // Real Gemini API call — run on exactly one project to avoid multiplying
+    // real (free-tier) API usage across the cross-browser/mobile matrix.
+    test.skip(
+      testInfo.project.name !== "chromium",
+      "Real Gemini call — runs once on chromium only to conserve free-tier quota"
+    );
     await page.goto("/quiz");
 
     await fillOccasion(page);
