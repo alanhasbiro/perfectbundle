@@ -43,3 +43,8 @@ next-env.d.ts
 
 # stray nested Vite sub-scaffold (not part of this project)
 /PerfectBundle/
+
+# Playwright
+/test-results/
+/playwright-report/
+/playwright/.cache/
