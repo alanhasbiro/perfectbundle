@@ -8,8 +8,8 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Progress** | ~65% (M1 + M2 P0 done; production Convex deployed; M5 E2E core + cross-browser + a11y all green) |
-| **Current Phase** | M2 + M5 done (except Lighthouse) → M3/M4 next, both awaiting owner's PostHog/Clerk keys |
+| **Overall Progress** | ~67% (M1 + M2 P0 done; production Convex deployed; M5 E2E core + cross-browser + a11y all green; M3 PostHog config fixed + live) |
+| **Current Phase** | M3 analytics wiring fixed and deployed (dashboard build-out still manual/pending); M4 starting (Clerk keys received) |
 | **On Track?** | ✅ Yes |
 | **Last Updated** | 2026-07-17 |
 | **Last Commit** | see change log |
@@ -32,8 +32,8 @@ See `docs/tasks.md` for the live task list. Summary:
 |-----------|--------|----------|-------|
 | 1. Foundation | ✅ Complete | 100% | Live at perfectbundle.vercel.app; **production Convex deployed** (was local-only, fixed this session); PostHog key + Sentry still deferred (non-blocking) |
 | 2. Core MVP (P0) | ✅ Complete | 95% | Quiz, engine, links, results UI, share, trending all done and live-verified. Only deferred: item swap/per-bundle regenerate (P1, needs new engine capability — backlogged) |
-| 3. Analytics | ⏳ Not Started | 0% | Events already fire from M2 work; PostHog dashboard build-out remains (needs owner's PostHog key) |
-| 4. Accounts & Retention | ⏳ Not Started | 0% | Needs owner's Clerk account/keys |
+| 3. Analytics | 🔄 In Progress | 25% | Fixed real bugs: PostHog project is on EU cloud but key/host in Vercel were wrong region (401s) — corrected and redeployed; confirmed `config.js` resolves 200 in production. Could NOT get a definitive automated (Playwright) confirmation that `posthog.capture()` reaches the network in this dev/build setup despite extensive debugging (SDK inits fine, consent optedIn, direct HTTP capture works) — needs one manual check: visit perfectbundle.vercel.app, then check PostHog → Activity → Events a few minutes later. Dashboard/funnel/attribution insights (P0) still need manual PostHog UI setup — no personal API key available to automate |
+| 4. Accounts & Retention | 🔄 Starting | 0% | Clerk keys received this session; Clerk CLI setup in progress |
 | 5. Testing & Polish | 🔄 In Progress | 80% | E2E suite: 41 passing across chromium/firefox/webkit/mobile-chrome (3 intentionally skipped off-chromium — quota control) + baseline a11y audit passing on all 4. Only Lighthouse performance scoring remains |
 | 6. Launch | ⏳ Not Started | 0% | |
 
@@ -96,13 +96,14 @@ See `docs/tasks.md` for the live task list. Summary:
 ## Next Actions 📋
 
 ### Immediate (Next Commit)
-1. [ ] **Owner:** set `NEXT_PUBLIC_CONVEX_URL=https://scintillating-cheetah-642.convex.cloud` in Vercel Production env vars (unblocks the live site) — if not already done
-2. [ ] **Owner:** PostHog + Clerk account/keys (instructions given this session) — unblocks M3 + M4
-3. [ ] Once keys land: plan Milestone 3 (Analytics dashboard) and Milestone 4 (accounts) via `superpowers:writing-plans`
+1. [ ] **Owner:** visit perfectbundle.vercel.app, then check PostHog → Activity → Events to confirm events are actually landing (couldn't get automated proof — see M3 row above)
+2. [ ] Build M3 dashboard/funnel/attribution insights in PostHog UI (manual, ~10 min, no API access available to automate)
+3. [ ] Continue M4 Clerk setup (CLI install, auth, init, auth UI)
 
 ### Short-term
 - [ ] Lighthouse performance pass (M5, last remaining item, needs separate tooling setup)
 - [ ] Wire E2E suite into GitHub Actions CI once a CI-safe Gemini key/quota strategy is decided
+- [ ] Convex `engagementCounters` (M3 P1, clicks/saves/shares per bundle) — not started
 
 ---
 
@@ -125,6 +126,8 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-17 | Gemini model: `gemini-flash-latest` (resolves to gemini-3.5-flash) | `gemini-2.5-flash`/`-lite` returned 404 "no longer available to new users" on live test; `-latest` alias self-updates, avoiding future breakage | Pinning an explicit version (more predictable but needs manual updates as Google deprecates models) |
 | 2026-07-17 | E2E share-page test seeds data via a dedicated `convex/testSupport.ts` mutation, not a full quiz→share click-through | Zero Gemini cost, fast, deterministic; a live click-through already exercises share via quiz-flow.spec.ts indirectly | Mocking the Convex action at the network layer (more setup, less confidence in real integration) |
 | 2026-07-17 | Playwright E2E runs serially (`workers: 1`), not wired into CI yet | Suite shares one local Convex backend + rate limiter; CI would need a dedicated Gemini quota strategy not yet decided | Parallel workers (tried first, worked by luck — not relied upon) |
+| 2026-07-17 | PostHog project confirmed on EU cloud (`eu.i.posthog.com`/`eu-assets.i.posthog.com`), not US | Direct API test against `app.posthog.com` (legacy US alias) returned 401/404; switching host to `eu.i.posthog.com` fixed config load | Assumed US region by default (wrong) |
+| 2026-07-17 | Kept `instrumentation-client.ts` as the single PostHog init site; did not add a second React-provider-based init | A duplicate `posthog.init()` call triggers the SDK's own "already initialized" guard and silently drops the second call's config — found by testing, not inspection | A `PostHogProvider` React component (built, then reverted once the conflict was found) |
 
 ---
 
@@ -167,7 +170,8 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-17 | 8a9cf71 | SEO basics: robots.txt, sitemap.xml, landing OG metadata |
 | 2026-07-17 | eaac2ea | M5 sprint 2 (cross-browser, mobile, a11y) plan |
 | 2026-07-17 | 56d5b2d…ec6c850 | M5 sprint 2: firefox/webkit/mobile-chrome projects, axe-core a11y audit + real reduced-motion fix, Convex AI files updated |
-| 2026-07-17 | pending | M5 sprint 2 docs closeout |
+| 2026-07-17 | 8c7125d, 226afd2 | M3: fixed PostHog region mismatch (EU not US) in Vercel prod env vars; found+reverted a redundant double-init; confirmed live prod config resolves. Automated event-delivery proof still unresolved — flagged for manual PostHog UI check |
+| 2026-07-17 | pending | M5 sprint 2 docs closeout; M4 Clerk setup starting |
 
 ---
 
