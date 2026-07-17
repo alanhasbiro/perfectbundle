@@ -104,6 +104,16 @@ describe("navigation", () => {
     expect(back(s).stepIndex).toBe(0);
   });
 
+  it("profileId (when present on state) survives next/back/setAnswers", () => {
+    let s: ReturnType<typeof start> = { ...start(), profileId: "profile-1" };
+    s = setAnswers(s, { occasion: "birthday" });
+    expect(s.profileId).toBe("profile-1");
+    s = next(s);
+    expect(s.profileId).toBe("profile-1");
+    s = back(s);
+    expect(s.profileId).toBe("profile-1");
+  });
+
   it("next() on last step is a no-op (completion handled by caller)", () => {
     const s = filled();
     expect(s.stepIndex).toBe(QUIZ_STEPS.length - 1);

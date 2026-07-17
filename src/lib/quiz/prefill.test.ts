@@ -3,6 +3,7 @@ import { profileToQuizState } from "./prefill";
 
 describe("profileToQuizState", () => {
   const base = {
+    id: "profile-1",
     relationship: "Mum",
     ageBand: "55-64",
     interests: ["Cooking", "Gardening"],
@@ -16,6 +17,12 @@ describe("profileToQuizState", () => {
     expect(state.answers.interests).toEqual(["Cooking", "Gardening"]);
     expect(state.answers.country).toBe("GB");
     expect(state.answers.currency).toBe("GBP");
+  });
+
+  it("carries the profile id on the returned state, outside answers", () => {
+    const state = profileToQuizState(base, "GB", "GBP");
+    expect(state.profileId).toBe("profile-1");
+    expect((state.answers as Record<string, unknown>).profileId).toBeUndefined();
   });
 
   it("leaves per-gift fields blank for the user to fill", () => {

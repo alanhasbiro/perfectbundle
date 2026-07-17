@@ -5,6 +5,7 @@ import type { QuizState } from "./types";
 // per-gift fields (occasion, budget, urgency) are intentionally left blank so
 // the user answers them anew each time they make a gift for this person.
 export interface ProfileForPrefill {
+  id: string;
   relationship: string;
   ageBand: string;
   gender?: string;
@@ -16,6 +17,9 @@ export interface ProfileForPrefill {
 // at the first step so the user still picks occasion/budget/etc. Country and
 // currency come from the current session (detected client-side), not the
 // profile — where you shop can differ from who you're shopping for.
+// `profileId` rides on the state itself (not `answers`) so it never becomes
+// part of QuizAnswers/the generation cache hash — see generateBundles.ts for
+// where it's picked back up and used.
 export function profileToQuizState(
   profile: ProfileForPrefill,
   country: string,
@@ -23,6 +27,7 @@ export function profileToQuizState(
 ): QuizState {
   return {
     stepIndex: 0,
+    profileId: profile.id,
     answers: {
       relationship: profile.relationship,
       ageBand: profile.ageBand,

@@ -27,5 +27,6 @@ export type PartialAnswers = Partial<QuizAnswers> & {
 
 export interface QuizState {
   stepIndex: number;
+  profileId?: string;
   answers: PartialAnswers;
 }
