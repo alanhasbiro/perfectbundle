@@ -27,11 +27,18 @@ export default function ProfilesPage() {
   // handler (Date.now / sessionStorage only run on click), so useCallback also
   // keeps it out of the render-phase purity check — matching use-quiz.ts submit().
   const startBundlesFor = useCallback(
-    (p: { relationship: string; ageBand: string; gender?: string; interests: string[]; notes?: string }) => {
+    (p: {
+      _id: Id<"recipientProfiles">;
+      relationship: string;
+      ageBand: string;
+      gender?: string;
+      interests: string[];
+      notes?: string;
+    }) => {
       const country = detectCountry(
         typeof navigator !== "undefined" ? navigator.language : undefined
       );
-      const state = profileToQuizState(p, country, currencyForCountry(country));
+      const state = profileToQuizState({ id: p._id, ...p }, country, currencyForCountry(country));
       sessionStorage.setItem(STATE_KEY, JSON.stringify(state));
       sessionStorage.setItem(STARTED_KEY, String(Date.now()));
       router.push("/quiz");
