@@ -102,7 +102,11 @@ async function callGemini(prompt: string): Promise<string | null> {
 // Convex guidelines, action-to-action calls should be avoided when a plain
 // helper function (this one) will do.
 export const generate = action({
-  args: { quiz: quizValidator, rateLimitKey: v.string() },
+  args: {
+    quiz: quizValidator,
+    rateLimitKey: v.string(),
+    profileId: v.optional(v.id("recipientProfiles")),
+  },
   handler: async (ctx, args): Promise<GenerateResult> => {
     const quiz = args.quiz as QuizAnswers;
 
@@ -113,15 +117,39 @@ export const generate = action({
     });
     if (!allowed) return { status: "rate_limited" };
 
+    // If a profileId was supplied, verify the caller actually owns that
+    // profile before trusting (or writing to) its past-item memory. A
+    // mismatch or missing identity silently falls back to no-profile
+    // behaviour rather than failing the whole generation — dedup memory is a
+    // nice-to-have, not a security boundary for the bundle itself.
+    let verifiedProfileId: Id<"recipientProfiles"> | null = null;
+    let pastItemNames: string[] = [];
+    if (args.profileId) {
+      const identity = await ctx.auth.getUserIdentity();
+      if (identity) {
+        const profile = await ctx.runQuery(internal.recipientProfiles.getByIdInternal, {
+          id: args.profileId,
+        });
+        if (profile && profile.userId === identity.subject) {
+          verifiedProfileId = args.profileId;
+          pastItemNames = profile.pastItemNames ?? [];
+        }
+      }
+    }
+
     const quizHash = hashQuizAnswers(quiz);
+    // Fold the profile id into the cache key so a cache hit can never return
+    // bundles generated (and thus dedup-checked) for a different profile, or
+    // skip a live profile's dedup exclusion.
+    const cacheKey = verifiedProfileId ? `${quizHash}:${verifiedProfileId}` : quizHash;
 
     const cached = await ctx.runQuery(internal.generationCache.getFresh, {
-      quizHash,
+      quizHash: cacheKey,
       maxAgeMs: CACHE_TTL_MS,
     });
     if (cached) return { status: "ok", bundleIds: cached.bundleIds, cacheHit: true };
 
-    const prompt = buildBundlePrompt(quiz);
+    const prompt = buildBundlePrompt(quiz, pastItemNames);
 
     let raw = await callGemini(prompt);
     let parsed = raw
@@ -147,10 +175,18 @@ export const generate = action({
     });
 
     await ctx.runMutation(internal.generationCache.store, {
-      quizHash,
+      quizHash: cacheKey,
       bundleIds,
       ttl: CACHE_TTL_MS,
     });
+
+    if (verifiedProfileId) {
+      const newItemNames = parsed.bundles.flatMap((b) => b.items.map((item) => item.name));
+      await ctx.runMutation(internal.recipientProfiles.appendPastItemsInternal, {
+        id: verifiedProfileId,
+        itemNames: newItemNames,
+      });
+    }
 
     return { status: "ok", bundleIds, cacheHit: false };
   },

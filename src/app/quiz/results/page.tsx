@@ -11,6 +11,7 @@ import { budgetBand } from "@/lib/bundles/budget-status";
 import { track } from "@/lib/analytics";
 import { BundleCard } from "@/components/bundles/bundle-card";
 import type { BundleItemLike } from "@/components/bundles/bundle-card-types";
+import { PROFILE_ID_KEY } from "@/components/quiz/use-quiz";
 
 type AnswersState = { loaded: false } | { loaded: true; answers: QuizAnswers | null };
 
@@ -24,14 +25,24 @@ function readAnswers(): QuizAnswers | null {
   return null;
 }
 
+function readProfileId(): string | null {
+  try {
+    return sessionStorage.getItem(PROFILE_ID_KEY);
+  } catch {
+    return null;
+  }
+}
+
 export default function ResultsPage() {
   const [answersState, setAnswersState] = useState<AnswersState>({ loaded: false });
+  const [profileId, setProfileId] = useState<string | null>(null);
   const mountedRef = useRef(false);
 
   useEffect(() => {
     if (mountedRef.current) return; // StrictMode double-invoke guard
     mountedRef.current = true;
     setAnswersState({ loaded: true, answers: readAnswers() });
+    setProfileId(readProfileId());
   }, []);
 
   if (!answersState.loaded) return null;
@@ -47,10 +58,16 @@ export default function ResultsPage() {
     );
   }
 
-  return <ResultsForAnswers answers={answersState.answers} />;
+  return <ResultsForAnswers answers={answersState.answers} profileId={profileId} />;
 }
 
-function ResultsForAnswers({ answers }: { answers: QuizAnswers }) {
+function ResultsForAnswers({
+  answers,
+  profileId,
+}: {
+  answers: QuizAnswers;
+  profileId: string | null;
+}) {
   const generate = useAction(api.generateBundles.generate);
   type GenState =
     | { phase: "generating" }
@@ -65,7 +82,11 @@ function ResultsForAnswers({ answers }: { answers: QuizAnswers }) {
     requestedRef.current = true;
     (async () => {
       const rateLimitKey = getOrCreateSessionId();
-      const result = await generate({ quiz: answers, rateLimitKey });
+      const result = await generate({
+        quiz: answers,
+        rateLimitKey,
+        ...(profileId ? { profileId: profileId as Id<"recipientProfiles"> } : {}),
+      });
       if (result.status === "ok") {
         setGenState({ phase: "ok", bundleIds: result.bundleIds, cacheHit: result.cacheHit });
       } else if (result.status === "rate_limited") {
