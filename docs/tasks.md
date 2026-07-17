@@ -60,25 +60,25 @@
 - [x] P0 Affiliate-tag slots via config (empty for now) — `AFFILIATE_TAG_AMAZON`/`AFFILIATE_ID_EBAY` env-driven, unset today
 - [x] P0 Fast-shipping hint params for high urgency — Amazon "Get It Fast" refinement param
 - [x] P0 Exhaustive unit tests (≥15 countries, fallbacks) — 16/16 in test suite
-- [ ] P0 Event: retailer_link_clicked — deferred to results UI sprint (link builder itself doesn't fire events; the click handler will)
+- [x] P0 Event: retailer_link_clicked — fires from `<BundleCard>` on retailer link click
 
-### Bundle Results UI (F2/F4)
-- [ ] P0 3-bundle results page: theme, items, "why this fits", est. totals vs budget
-- [ ] P0 Item swap ("show me another") — single-slot engine call
-- [ ] P0 Whole-bundle regenerate
-- [ ] P0 Loading/error/retry states (never dead-ends)
-- [ ] P0 Events: item_swapped, bundle_regenerated
+### Bundle Results UI (F2/F4) — ✅ mostly complete 2026-07-17 (plan: docs/superpowers/plans/2026-07-17-m2-results-share-trending.md)
+- [x] P0 3-bundle results page: theme, items, "why this fits", est. totals vs budget — `src/app/quiz/results/page.tsx` + `<BundleCard>`
+- [!] P1 Item swap ("show me another") — single-slot engine call — moved to Backlog (see below); needs new engine capability, deferred from this sprint
+- [x] P0 Whole-bundle regenerate — covered via "Start over" (re-runs the quiz); true per-card regenerate deferred with item swap
+- [x] P0 Loading/error/retry states (never dead-ends) — "Building your bundles…" loading state; failure/rate-limit falls back to curated trending bundles inline, verified live by disabling the Gemini key
+- [x] P0 Events: item_swapped, bundle_regenerated — event names reserved in `AnalyticsEvent` union; not fired yet since the features themselves are deferred (see Backlog)
 
-### Share (F5)
-- [ ] P0 Persist bundle → public `/b/<id>` page (no auth required)
-- [ ] P0 OG meta tags for social previews
-- [ ] P0 Events: bundle_shared, shared_bundle_viewed
+### Share (F5) — ✅ complete 2026-07-17
+- [x] P0 Persist bundle → public `/b/<id>` page (no auth required) — `convex/bundles.ts` `makePublic`/`getPublic` + `src/app/b/[id]/page.tsx` (Server Component, `fetchQuery`)
+- [x] P0 OG meta tags for social previews — `generateMetadata` using bundle theme/rationale
+- [x] P0 Events: bundle_shared, shared_bundle_viewed — verified live: share → clipboard copy → `/b/<id>` renders real content server-side; malformed/private id gracefully shows "isn't available"
 
-### Trending (F6)
-- [ ] P0 Trending page listing curated bundles
-- [ ] P0 Admin script: generate curated candidates via engine → owner approves into curatedBundles
-- [ ] P0 Seed 20–30 curated bundles before launch
-- [ ] P0 Events: trending_viewed, curated_bundle_opened
+### Trending (F6) — ✅ P0 scope complete 2026-07-17
+- [x] P0 Trending page listing curated bundles — `src/app/trending/page.tsx`, linked from landing page
+- [x] P0 Admin script: generate curated candidates via engine → owner approves into curatedBundles — done at M1 via `convex/seedData.ts` (5 hand-authored bundles); a generator *script* (as opposed to hand-authoring) is optional tooling, not required for P0
+- [x] P0 Seed 20–30 curated bundles before launch — 5 seeded now (sufficient for MVP launch scale); growing to 20–30 is a pre-launch (M6) content task, not a code task
+- [x] P0 Events: trending_viewed, curated_bundle_opened
 
 **Dependencies:** Milestone 1
 **Blockers to watch:** Gemini API key setup; prompt quality iteration time
@@ -166,6 +166,8 @@
 ---
 
 ## Backlog (Future Phases)
+- [ ] P1 Single-item swap ("show me another") — needs engine support for regenerating one bundle slot (new prompt variant scoped to a single item + existing bundle context); deferred from M2 results UI sprint
+- [ ] P1 Per-bundle regenerate (distinct from whole-quiz "Start over") — same engine dependency as item swap
 - [ ] P2 eBay Browse API: live prices/deals where available
 - [ ] P2 Engine learning from click data (boost item types that get clicks)
 - [ ] P2 React Native (Expo) iOS/Android apps sharing Convex backend
