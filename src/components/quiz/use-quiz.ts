@@ -21,6 +21,7 @@ import { track } from "@/lib/analytics";
 // same storage the quiz hydrates from (keys must stay in one place).
 export const STATE_KEY = "pb.quizState";
 export const STARTED_KEY = "pb.quizStartedAt";
+export const PROFILE_ID_KEY = "pb.quizProfileId";
 const ANSWERS_KEY = "pb.quizAnswers";
 
 function loadInitial(): { state: QuizState; fresh: boolean } {
@@ -93,6 +94,11 @@ export function useQuiz() {
       duration_s: Math.round((Date.now() - startedAt) / 1000),
     });
     sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(answers));
+    if (state.profileId) {
+      sessionStorage.setItem(PROFILE_ID_KEY, state.profileId);
+    } else {
+      sessionStorage.removeItem(PROFILE_ID_KEY);
+    }
     sessionStorage.removeItem(STATE_KEY);
     router.push("/quiz/results");
   }, [state, router]);
