@@ -72,6 +72,7 @@ export default defineSchema({
     gender: v.optional(v.string()),
     interests: v.array(v.string()),
     notes: v.optional(v.string()),
+    pastItemNames: v.optional(v.array(v.string())),
     createdAt: v.number(),
   }).index("by_user", ["userId"]),
 

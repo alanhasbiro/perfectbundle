@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { mutation, query } from "./_generated/server";
+import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 
 // Recipient profiles let a signed-in user save the people they buy for, so
 // they can regenerate bundles without re-answering the "who is it for" fields.
@@ -22,6 +22,7 @@ export const create = mutation({
     return await ctx.db.insert("recipientProfiles", {
       userId: identity.subject,
       createdAt: Date.now(),
+      pastItemNames: [],
       ...args,
     });
   },
@@ -64,6 +65,33 @@ export const remove = mutation({
       throw new Error("Profile not found");
     }
     await ctx.db.delete("recipientProfiles", id);
+    return null;
+  },
+});
+
+const MAX_PAST_ITEMS = 50;
+
+// Internal-only: the generateBundles action uses this to verify ownership of
+// a profileId passed in from the client before trusting its past-item memory.
+export const getByIdInternal = internalQuery({
+  args: { id: v.id("recipientProfiles") },
+  handler: async (ctx, { id }) => {
+    return await ctx.db.get("recipientProfiles", id);
+  },
+});
+
+// Internal-only: called by generateBundles after a fresh (non-cached)
+// generation to remember what was just suggested, so future generations for
+// the same profile avoid repeating it. Dedupes and keeps only the most
+// recent MAX_PAST_ITEMS names.
+export const appendPastItemsInternal = internalMutation({
+  args: { id: v.id("recipientProfiles"), itemNames: v.array(v.string()) },
+  handler: async (ctx, { id, itemNames }) => {
+    const existing = await ctx.db.get("recipientProfiles", id);
+    if (!existing) return null;
+    const merged = Array.from(new Set([...(existing.pastItemNames ?? []), ...itemNames]));
+    const capped = merged.slice(-MAX_PAST_ITEMS);
+    await ctx.db.patch("recipientProfiles", id, { pastItemNames: capped });
     return null;
   },
 });
