@@ -93,7 +93,7 @@
 - [ ] P0 PostHog funnel: page_view → quiz_started → quiz_completed → bundles_generated → retailer_link_clicked
 - [ ] P0 Headline metrics dashboard (bundles/week, completion %, CTR, shares)
 - [ ] P0 Channel attribution insight (by utm_source incl. share links)
-- [ ] P1 Convex engagementCounters wired (clicks/saves/shares per bundle)
+- [x] P1 Convex engagementCounters wired (clicks/saves/shares per bundle) — `convex/engagement.ts` `record` mutation fired fire-and-forget from link-click/save/share/view touchpoints (both curated + generated); `src/lib/bundles/popularity.ts` pure scorer (plan: docs/superpowers/plans/2026-07-18-m4-popular-tab.md)
 
 **Dependencies:** Milestone 2 features emitting events
 
@@ -124,8 +124,8 @@
 - [ ] P1 Events: reminder_set, reminder_email_sent, reminder_email_clicked
 
 ### Popular Tab (F6)
-- [ ] P1 Engagement score ranking from engagementCounters
-- [ ] P1 Popular tab UI alongside Trending
+- [x] P1 Engagement score ranking from engagementCounters — `src/lib/bundles/popularity.ts` (pure, unit-tested; `3·clicks + 2·saves + 2·shares + views`), `convex/engagement.ts` `listPopular`
+- [x] P1 Popular tab UI alongside Trending — `/popular` ranks publicly-shared user-generated bundles (distinct from editorial `/trending`); cross-linked both ways; graceful cold-start empty state (plan: docs/superpowers/plans/2026-07-18-m4-popular-tab.md)
 
 ### Monetization Prep
 - [ ] P1 Apply: eBay Partner Network, Awin (Etsy); Amazon Associates once traffic exists

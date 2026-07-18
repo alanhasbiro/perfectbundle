@@ -49,15 +49,18 @@ detailed docs are linked at the bottom for when you need more than this gives.
 ## 5. Immediate next steps (build, unblocked)
 
 Per `docs/tasks.md` Milestone 4, next unstarted items:
-- Occasion reminders: CRUD + daily Convex cron (T-14/T-3) → Resend email
-- Popular tab (ranks by `engagementCounters`)
+- Occasion reminders: CRUD + daily Convex cron (T-14/T-3) → Resend email (needs owner's Resend API key for live email verification)
 - Wire the `signup` PostHog event to Clerk's sign-up completion
 
-(Done 2026-07-18: past-bundle memory — `recipientProfiles.pastItemNames` feeds an
-"avoid repeating" prompt instruction; `QuizState.profileId` threads profile→quiz→
-generate, kept out of `QuizAnswers`/cache hash; the generation-cache key folds in
-`profileId` so a stale hit can't skip dedup. See
-`docs/superpowers/plans/2026-07-18-m4-past-bundle-memory.md`.)
+(Done 2026-07-18:
+ • Past-bundle memory — `recipientProfiles.pastItemNames` feeds an "avoid repeating"
+   prompt instruction; `QuizState.profileId` threads profile→quiz→generate, kept out
+   of `QuizAnswers`/cache hash; the generation-cache key folds in `profileId` so a
+   stale hit can't skip dedup. Plan: `docs/superpowers/plans/2026-07-18-m4-past-bundle-memory.md`.
+ • Engagement counters + Popular tab — `convex/engagement.ts` `record` upserts per-bundle
+   counters at every click/save/share/view; `/popular` ranks publicly-shared user bundles
+   by engagement score, distinct from editorial `/trending`. Plan:
+   `docs/superpowers/plans/2026-07-18-m4-popular-tab.md`.)
 
 ## 6. Deeper reference (read only if this file doesn't answer it)
 
