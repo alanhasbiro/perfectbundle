@@ -10,6 +10,7 @@
 
 import type * as bundles from "../bundles.js";
 import type * as curated from "../curated.js";
+import type * as engagement from "../engagement.js";
 import type * as generateBundles from "../generateBundles.js";
 import type * as generationCache from "../generationCache.js";
 import type * as rateLimit from "../rateLimit.js";
@@ -28,6 +29,7 @@ import type {
 declare const fullApi: ApiFromModules<{
   bundles: typeof bundles;
   curated: typeof curated;
+  engagement: typeof engagement;
   generateBundles: typeof generateBundles;
   generationCache: typeof generationCache;
   rateLimit: typeof rateLimit;
