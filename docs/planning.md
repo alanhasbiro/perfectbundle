@@ -202,9 +202,9 @@ CLERK_SECRET_KEY=
 RESEND_API_KEY=            # Convex env
 
 # Product images & data (see specs/2026-07-18-product-data-and-images-design.md)
-PEXELS_API_KEY=           # Convex env; representative item images (Phase 1). Unset = no-op
-SOVRN_API_KEY=            # Convex env; Sovrn Commerce Product API — real photos+buy links+revenue (Phase 2)
-SOVRN_ACCOUNT_ID=         # Sovrn account/affiliate id
+PEXELS_API_KEY=           # Convex env; representative item images (Phase 1). Unset = no-op. Pexels keys are ~56 chars
+SOVRN_SITE_API_KEY=       # Convex env; goes in the Sovrn Product API URL path ({site-api-key})
+SOVRN_SECRET_KEY=         # Convex env; goes in the Sovrn auth header ("authorization: secret <key>")
 
 # Affiliate tags (config, empty until approved)
 AFFILIATE_TAG_AMAZON=
