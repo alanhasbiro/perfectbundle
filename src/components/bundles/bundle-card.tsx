@@ -38,6 +38,9 @@ export function BundleCard({
 
   const status = budget !== undefined ? classifyBudgetStatus(content.estTotal, budget) : "unknown";
   const budgetLabel = BUDGET_LABEL[status];
+  // Show the FTC/affiliate disclosure only when this card actually contains
+  // affiliate ("Buy at …") links — i.e. once Sovrn has populated productUrl.
+  const hasAffiliateLinks = content.items.some((item) => item.productUrl);
 
   const handleShare = async () => {
     if (!bundleId) return;
@@ -105,8 +108,24 @@ export function BundleCard({
               <p className="font-medium">{item.name}</p>
               <p className="mt-1 text-sm opacity-70">{item.description}</p>
               <p className="mt-1 text-sm italic opacity-60">{item.why}</p>
-              <p className="mt-2 text-sm font-medium">{item.estPriceRange}</p>
+              <p className="mt-2 text-sm font-medium">
+                {item.productPrice ? item.productPrice : item.estPriceRange}
+                {item.productPrice ? (
+                  <span className="ml-1 text-xs font-normal opacity-50">at {item.productMerchant}</span>
+                ) : null}
+              </p>
               <div className="mt-3 flex flex-wrap gap-2">
+                {item.productUrl ? (
+                  <a
+                    href={item.productUrl}
+                    target="_blank"
+                    rel="noopener noreferrer sponsored"
+                    onClick={() => onLinkClick?.(item.productMerchant ?? "sovrn", item)}
+                    className="rounded-full bg-foreground px-3 py-1.5 text-xs text-background transition hover:opacity-85"
+                  >
+                    Buy{item.productMerchant ? ` at ${item.productMerchant}` : ""}
+                  </a>
+                ) : null}
                 {links.map((link) => (
                   <a
                     key={link.retailer}
@@ -116,7 +135,7 @@ export function BundleCard({
                     onClick={() => onLinkClick?.(link.retailer, item)}
                     className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs transition hover:border-foreground/50"
                   >
-                    {link.label}
+                    {item.productUrl ? `Or ${link.label}` : link.label}
                   </a>
                 ))}
               </div>
@@ -124,6 +143,11 @@ export function BundleCard({
           );
         })}
       </ul>
+      {hasAffiliateLinks ? (
+        <p className="text-xs opacity-50">
+          Some “Buy” links are affiliate links — we may earn a small commission at no extra cost to you.
+        </p>
+      ) : null}
     </article>
   );
 }

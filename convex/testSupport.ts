@@ -101,6 +101,9 @@ export const seedPopularBundle = mutation({
           estPriceRange: "$15-20",
           searchQuery: "popular item two",
           tags: ["test"],
+          productUrl: "https://example-retailer.test/buy/popular-item-two?aff=e2e",
+          productPrice: "$17.99",
+          productMerchant: "TestMart",
         },
         {
           name: "Popular Item Three",
