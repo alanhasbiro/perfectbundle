@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import Link from "next/link";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { BundleCard } from "@/components/bundles/bundle-card";
 import { track } from "@/lib/analytics";
@@ -17,6 +17,7 @@ const DEFAULT_URGENCY = "normal" as const;
 
 export default function TrendingPage() {
   const curated = useQuery(api.curated.listApproved);
+  const record = useMutation(api.engagement.record);
   const viewedRef = useRef(false);
 
   useEffect(() => {
@@ -27,6 +28,7 @@ export default function TrendingPage() {
 
   const handleLinkClick = (bundleId: string, retailer: string, item: BundleItemLike) => {
     track("curated_bundle_opened", { bundle_id: bundleId, retailer, item_tags: item.tags });
+    void record({ bundleId, kind: "curated", type: "linkClicks" });
   };
 
   return (

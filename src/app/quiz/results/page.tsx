@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { useAction, useQuery } from "convex/react";
+import { useAction, useMutation, useQuery } from "convex/react";
 import { api } from "../../../../convex/_generated/api";
 import type { Id } from "../../../../convex/_generated/dataModel";
 import type { QuizAnswers } from "@/lib/quiz/types";
@@ -69,6 +69,7 @@ function ResultsForAnswers({
   profileId: string | null;
 }) {
   const generate = useAction(api.generateBundles.generate);
+  const record = useMutation(api.engagement.record);
   type GenState =
     | { phase: "generating" }
     | { phase: "ok"; bundleIds: Id<"bundles">[]; cacheHit: boolean }
@@ -122,8 +123,14 @@ function ResultsForAnswers({
     }
   }, [genState, generatedBundles, answers.budget]);
 
-  const handleLinkClick = (bundleId: string, retailer: string, item: BundleItemLike) => {
+  const handleLinkClick = (
+    bundleId: string,
+    retailer: string,
+    item: BundleItemLike,
+    kind: "generated" | "curated" = "generated"
+  ) => {
     track("retailer_link_clicked", { retailer, bundle_id: bundleId, item_tags: item.tags });
+    void record({ bundleId, kind, type: "linkClicks" });
   };
 
   if (genState.phase === "generating") {
@@ -150,7 +157,7 @@ function ResultsForAnswers({
               content={bundle}
               country="US"
               urgency="normal"
-              onLinkClick={(retailer, item) => handleLinkClick(bundle._id, retailer, item)}
+              onLinkClick={(retailer, item) => handleLinkClick(bundle._id, retailer, item, "curated")}
             />
           ))
         )}

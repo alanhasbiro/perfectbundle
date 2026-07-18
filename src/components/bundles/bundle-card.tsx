@@ -33,6 +33,7 @@ export function BundleCard({
   onLinkClick?: (retailer: string, item: BundleItemLike) => void;
 }) {
   const makePublic = useMutation(api.bundles.makePublic);
+  const record = useMutation(api.engagement.record);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "copied">("idle");
 
   const status = budget !== undefined ? classifyBudgetStatus(content.estTotal, budget) : "unknown";
@@ -50,6 +51,7 @@ export function BundleCard({
       // from wherever the app surfaces it; sharing state still confirms success.
     }
     track("bundle_shared", { bundle_id: bundleId });
+    void record({ bundleId, kind: "generated", type: "shares" });
     setShareState("copied");
     setTimeout(() => setShareState("idle"), 2000);
   };

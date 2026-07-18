@@ -35,6 +35,7 @@ function SavedToggle({ bundleId }: { bundleId: Id<"bundles"> }) {
   const saved = useQuery(api.savedBundles.isSaved, { bundleId });
   const save = useMutation(api.savedBundles.save);
   const remove = useMutation(api.savedBundles.remove);
+  const record = useMutation(api.engagement.record);
 
   const handleClick = async () => {
     if (saved) {
@@ -42,6 +43,7 @@ function SavedToggle({ bundleId }: { bundleId: Id<"bundles"> }) {
     } else {
       await save({ bundleId });
       track("bundle_saved", { bundle_id: bundleId });
+      void record({ bundleId, kind: "generated", type: "saves" });
     }
   };
 
