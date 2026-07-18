@@ -88,6 +88,20 @@ export function BundleCard({
           const links = buildRetailerLinks(item.searchQuery, country, urgency);
           return (
             <li key={item.name} className="rounded-xl border border-foreground/10 p-4">
+              {item.imageUrl ? (
+                <div className="mb-3">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.imageUrl}
+                    alt={item.name}
+                    loading="lazy"
+                    className="h-40 w-full rounded-lg object-cover"
+                  />
+                  {item.imageIsRepresentative ? (
+                    <p className="mt-1 text-xs opacity-50">Representative image</p>
+                  ) : null}
+                </div>
+              ) : null}
               <p className="font-medium">{item.name}</p>
               <p className="mt-1 text-sm opacity-70">{item.description}</p>
               <p className="mt-1 text-sm italic opacity-60">{item.why}</p>
