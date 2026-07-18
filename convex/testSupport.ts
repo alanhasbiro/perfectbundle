@@ -90,6 +90,9 @@ export const seedPopularBundle = mutation({
           estPriceRange: "$10-15",
           searchQuery: "popular item one",
           tags: ["test"],
+          imageUrl:
+            "https://images.pexels.com/photos/1002740/pexels-photo-1002740.jpeg?auto=compress&cs=tinysrgb&h=350",
+          imageIsRepresentative: true,
         },
         {
           name: "Popular Item Two",

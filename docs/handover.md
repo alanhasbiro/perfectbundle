@@ -22,10 +22,10 @@ detailed docs are linked at the bottom for when you need more than this gives.
 
 ## 2. What's blocked (not actionable right now)
 
-- **Real product photos + direct retailer links.** Needs eBay/Etsy/Amazon product-search APIs.
-  - Amazon: blocked by design — PA-API requires an *already-approved* Associate with qualifying sales (chicken-and-egg). Apply anyway to start the clock; stays search-link-only regardless.
-  - eBay: owner's developer app awaiting approval.
-  - Etsy: owner has a keystring + shared secret, but `GET /v3/application/openapi-ping` returns `403 "API key not found or not active"`. Not yet root-caused — likely the Etsy app isn't marked Active in their dashboard yet. **Owner should check developer dashboard app status before we retry.**
+- **Real product photos + direct retailer links — STRATEGY PIVOTED (2026-07-18).** Etsy rejected the app; Amazon/eBay expected to as well (per-retailer approval is a dead end). New plan: go through **Sovrn Commerce** — a free affiliate aggregator with day-one publisher approval whose Product API returns real photo + direct affiliate buy link + price + merchant across all major retailers (one integration = photos + buyable links + revenue). Spec: `docs/superpowers/specs/2026-07-18-product-data-and-images-design.md`.
+  - **Phase 1 SHIPPED:** representative item images via the free **Pexels** API give cards real photos now (env-gated on `PEXELS_API_KEY`, cached at generation, labelled "Representative image", best-effort). Plan: `docs/superpowers/plans/2026-07-18-phase1-representative-images.md`. **Owner action for the live image:** create a free Pexels API key (pexels.com/api) and add `PEXELS_API_KEY` to Convex env — without it, enrichment is a silent no-op (cards render text-only, as before).
+  - **Phase 2 (Sovrn) — owner action to unblock:** sign up free at sovrn.com/commerce → add `perfectbundle.vercel.app` as a campaign → await approval → Settings page → click the 🔑 icon next to the campaign for the API key → confirm the Product API is enabled. Then we wire it as the primary (real product) layer ahead of representative images.
+  - Amazon/eBay stay as pure upside if they ever approve; no longer the critical path.
 - **PostHog dashboards** (funnel, headline metrics, channel attribution) — must be built manually in PostHog's UI. No personal API key available to automate it.
 - **PostHog event-delivery proof** — couldn't get an automated (Playwright) confirmation that events actually land in PostHog, despite the plumbing checking out (SDK inits, consent optedIn, direct HTTP capture works standalone). **Owner should manually check PostHog → Activity → Events** after visiting the live site.
 

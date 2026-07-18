@@ -131,8 +131,13 @@
 - [ ] P1 Apply: eBay Partner Network, Awin (Etsy); Amazon Associates once traffic exists
 - [ ] P1 Flip affiliate tags via config when approved
 
+### Product images & buyable links (Sovrn workaround — spec: docs/superpowers/specs/2026-07-18-product-data-and-images-design.md)
+> Etsy rejected the app; Amazon/eBay likely too. Pivot: go through Sovrn Commerce (aggregator, free, day-one approval, has all retailers' product feeds + affiliate revenue) instead of per-retailer approval. Representative images bridge until then.
+- [x] Phase 1: Representative item images — free Pexels API, env-gated (`PEXELS_API_KEY`), fetched + cached at generation time, rendered with a "Representative image" caption; pure media module unit-tested (`src/lib/engine/media.ts`), best-effort (never blocks generation). Plan: docs/superpowers/plans/2026-07-18-phase1-representative-images.md
+- [ ] Phase 2: Sovrn Product API — real product photo + direct affiliate buy link + price + merchant, layered ahead of representative images; primary "Buy at {merchant}" button; visible affiliate disclosure. Blocked on owner's free Sovrn Commerce signup + Product-API key.
+
 **Dependencies:** Milestones 2–3
-**Blockers to watch:** affiliate program approval timelines (external)
+**Blockers to watch:** affiliate program approval timelines (external); Phase 2 needs owner's Sovrn key
 
 ---
 
