@@ -4,6 +4,8 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { buildBundlePrompt } from "../src/lib/engine/prompt";
 import { parseBundleResponse } from "../src/lib/engine/parse-response";
+import { buildStockImageQuery, parsePexelsResponse, chooseItemMedia } from "../src/lib/engine/media";
+import type { BundleContent } from "../src/lib/engine/schemas";
 import { hashQuizAnswers } from "../src/lib/quiz/hash";
 import type { QuizAnswers } from "../src/lib/quiz/types";
 
@@ -96,6 +98,39 @@ async function callGemini(prompt: string): Promise<string | null> {
   return json.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
 }
 
+// Fetches a single representative photo URL for a search phrase from Pexels,
+// or null on any failure / no key. Never throws — media is best-effort.
+async function fetchStockImage(query: string): Promise<string | null> {
+  const apiKey = process.env.PEXELS_API_KEY;
+  if (!apiKey) return null;
+  try {
+    const url = `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1`;
+    const res = await fetch(url, { headers: { Authorization: apiKey } });
+    if (!res.ok) return null;
+    return parsePexelsResponse(await res.json());
+  } catch {
+    return null;
+  }
+}
+
+// Attaches best-effort media to every item of every bundle. Phase 1 resolves
+// only representative stock images (sovrn:null). Any per-item failure yields no
+// media for that item; the overall generation is never blocked.
+async function enrichBundlesWithMedia(bundles: BundleContent[]): Promise<BundleContent[]> {
+  return Promise.all(
+    bundles.map(async (bundle) => ({
+      ...bundle,
+      items: await Promise.all(
+        bundle.items.map(async (item) => {
+          const stock = await fetchStockImage(buildStockImageQuery(item));
+          const media = chooseItemMedia({ sovrn: null, stock });
+          return { ...item, ...media };
+        })
+      ),
+    }))
+  );
+}
+
 // Client-callable entry point for the results UI (next sprint). Everything lives
 // in one `action` (rather than an internalAction + wrapper) because it doesn't
 // need to cross runtimes — fetch() works in the default runtime — and per the
@@ -168,10 +203,12 @@ export const generate = action({
       return { status: "failed", reason: parsed.error };
     }
 
+    const enrichedBundles = await enrichBundlesWithMedia(parsed.bundles);
+
     const bundleIds: Id<"bundles">[] = await ctx.runMutation(internal.bundles.storeGenerated, {
       quizHash,
       quiz,
-      bundles: parsed.bundles,
+      bundles: enrichedBundles,
     });
 
     await ctx.runMutation(internal.generationCache.store, {
