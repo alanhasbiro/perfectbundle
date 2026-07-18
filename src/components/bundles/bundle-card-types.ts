@@ -5,6 +5,11 @@ export interface BundleItemLike {
   estPriceRange: string;
   searchQuery: string;
   tags: string[];
+  imageUrl?: string;
+  imageIsRepresentative?: boolean;
+  productUrl?: string;
+  productPrice?: string;
+  productMerchant?: string;
 }
 
 export interface BundleContentLike {

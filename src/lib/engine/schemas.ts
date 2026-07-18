@@ -9,6 +9,11 @@ export const bundleItemSchema = z.object({
   estPriceRange: z.string().min(1),
   searchQuery: z.string().min(1),
   tags: z.array(z.string().min(1)).min(1),
+  imageUrl: z.string().optional(),
+  imageIsRepresentative: z.boolean().optional(),
+  productUrl: z.string().optional(),
+  productPrice: z.string().optional(),
+  productMerchant: z.string().optional(),
 });
 
 export const bundleContentSchema = z.object({

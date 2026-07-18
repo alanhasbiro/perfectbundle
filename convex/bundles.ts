@@ -9,6 +9,11 @@ const bundleItemValidator = v.object({
   estPriceRange: v.string(),
   searchQuery: v.string(),
   tags: v.array(v.string()),
+  imageUrl: v.optional(v.string()),
+  imageIsRepresentative: v.optional(v.boolean()),
+  productUrl: v.optional(v.string()),
+  productPrice: v.optional(v.string()),
+  productMerchant: v.optional(v.string()),
 });
 
 const bundleContentValidator = v.object({
