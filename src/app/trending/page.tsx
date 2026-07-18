@@ -52,9 +52,14 @@ export default function TrendingPage() {
           />
         ))
       )}
-      <Link href="/quiz" className="text-sm underline opacity-70 hover:opacity-100">
-        Or take the quiz for a bundle picked just for someone →
-      </Link>
+      <div className="flex flex-wrap gap-4 text-sm">
+        <Link href="/popular" className="underline opacity-70 hover:opacity-100">
+          See what&apos;s popular →
+        </Link>
+        <Link href="/quiz" className="underline opacity-70 hover:opacity-100">
+          Or take the quiz for a bundle picked just for someone →
+        </Link>
+      </div>
     </main>
   );
 }

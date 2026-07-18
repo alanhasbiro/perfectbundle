@@ -58,3 +58,66 @@ export const seedPublicBundle = mutation({
     return id;
   },
 });
+
+// TEST-ONLY: seeds a public generated bundle plus an engagementCounters row so
+// the /popular page (api.engagement.listPopular) has deterministic content in
+// Playwright. Same trust caveat as seedPublicBundle above.
+export const seedPopularBundle = mutation({
+  args: {},
+  handler: async (ctx) => {
+    const id = await ctx.db.insert("bundles", {
+      createdAt: Date.now(),
+      quizHash: "e2e-popular-fixture",
+      quiz: {
+        occasion: "Birthday",
+        ageBand: "25-34",
+        relationship: "Friend",
+        interests: ["Testing"],
+        budget: 50,
+        currency: "USD",
+        urgency: "normal",
+        exclusions: [],
+        country: "US",
+      },
+      theme: "E2E Popular Bundle",
+      rationale: "Seeded directly for Playwright popular-page tests.",
+      estTotal: "$40-50",
+      items: [
+        {
+          name: "Popular Item One",
+          description: "A test item.",
+          why: "For testing.",
+          estPriceRange: "$10-15",
+          searchQuery: "popular item one",
+          tags: ["test"],
+        },
+        {
+          name: "Popular Item Two",
+          description: "A test item.",
+          why: "For testing.",
+          estPriceRange: "$15-20",
+          searchQuery: "popular item two",
+          tags: ["test"],
+        },
+        {
+          name: "Popular Item Three",
+          description: "A test item.",
+          why: "For testing.",
+          estPriceRange: "$10-15",
+          searchQuery: "popular item three",
+          tags: ["test"],
+        },
+      ],
+      isPublic: true,
+    });
+    await ctx.db.insert("engagementCounters", {
+      bundleId: id,
+      kind: "generated",
+      linkClicks: 5,
+      saves: 2,
+      shares: 1,
+      views: 10,
+    });
+    return id;
+  },
+});
