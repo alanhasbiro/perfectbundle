@@ -16,7 +16,7 @@ detailed docs are linked at the bottom for when you need more than this gives.
 - **Auth (Clerk):** sign-in/sign-up/UserButton in the site header. **Guest-first by design** — only save/profile/my-bundles routes require auth; quiz/results/share/trending stay public. Currently using Clerk **dev-mode keys** in production (no prod Clerk instance yet — needs a custom domain or manual dashboard step).
 - **Save bundles:** guest → signup upsell on the save action; `/my-bundles` page.
 - **Recipient profiles:** `/profiles` — create/edit/delete, plus "New bundles for X" which pre-fills the quiz (person-level fields only; occasion/budget/urgency re-answered per gift). `src/lib/quiz/prefill.ts` is the tested seam.
-- **Analytics (PostHog):** initializes via `instrumentation-client.ts` (do NOT add a second `posthog.init()` anywhere — see Gotchas). Project is on **EU cloud** (`eu.i.posthog.com`), not US. Events fire per `docs/prd.md` §2.3 canon; `signup` event is not yet wired to Clerk's sign-up completion.
+- **Analytics (PostHog):** initializes via `instrumentation-client.ts` (do NOT add a second `posthog.init()` anywhere — see Gotchas). Project is on **EU cloud** (`eu.i.posthog.com`), not US. Events fire per `docs/prd.md` §2.3 canon. `signup` is now code-complete — fires via a Clerk `user.created` webhook (`src/app/api/webhooks/clerk/route.ts`), not a client-side hook, so it's exactly-once regardless of which of the 3 signup entry points was used. **Not live yet**: needs the owner to register the webhook in the Clerk Dashboard (see §2/§4).
 - **E2E suite:** Playwright, 4 browser/device projects, 69 passed / 3 skipped (verified 2026-07-19). `npx playwright test --project=chromium` for a fast local check (18 of the 69).
 - **Monetization plan written:** `docs/monetization.md` — affiliate-first, phased, $0-to-run.
 - **Real product photos + direct buy links (DONE 2026-07-19).** Etsy's app was rejected → removed entirely from the codebase (regression-tested). eBay + Amazon got approved the same window, which reopened the direct-retailer route. **eBay's Browse API is now the live real-product layer**: OAuth client-credentials token (one per generation), per-item search, real photo + direct buyable item URL + real price (`src/lib/engine/media.ts` `parseEbayItemSummary`/`ebayMarketplaceForCountry`/`formatEbayPrice`, wired in `convex/generateBundles.ts`). **Verified live**: a real generation returned genuine eBay data for every item across all 3 bundles. Representative images (Unsplash primary + Pexels fallback, photographer-credited) are the automatic fallback when eBay has no match. Amazon's affiliate tag is flipped on (see Gotchas — a real client/server env-var bug was found and fixed along the way). Sovrn stays wired-but-unused behind the same `chooseItemMedia({ realProduct, stock })` seam as a documented future alternate source. Spec: `docs/superpowers/specs/2026-07-18-product-data-and-images-design.md`. Plans: `docs/superpowers/plans/2026-07-18-phase1-representative-images.md`, `docs/superpowers/plans/2026-07-19-ebay-real-products-affiliate-fix.md`.
@@ -25,6 +25,7 @@ detailed docs are linked at the bottom for when you need more than this gives.
 
 - **PostHog dashboards** (funnel, headline metrics, channel attribution) — must be built manually in PostHog's UI. No personal API key available to automate it.
 - **PostHog event-delivery proof** — couldn't get an automated (Playwright) confirmation that events actually land in PostHog, despite the plumbing checking out (SDK inits, consent optedIn, direct HTTP capture works standalone). **Owner should manually check PostHog → Activity → Events** after visiting the live site.
+- **`signup` event webhook registration** — code is done and tested (`src/app/api/webhooks/clerk/route.ts`, plan: `docs/superpowers/plans/2026-07-20-signup-event-clerk-webhook.md`), but firing live needs a one-time manual step only the owner can do: add a webhook endpoint in the Clerk Dashboard. See §4 step 3 for exact instructions.
 
 ## 3. Gotchas learned the hard way this project (don't re-break these)
 
@@ -42,16 +43,22 @@ detailed docs are linked at the bottom for when you need more than this gives.
 
 1. Visit https://perfectbundle.vercel.app, then check PostHog → Activity → Events to confirm analytics is actually landing.
 2. Build the PostHog dashboard views manually per `docs/dashboard-spec.md` (~10 min, one-time).
-3. Optional revenue boost: get an eBay Partner Network **campaign ID** and set it as `AFFILIATE_ID_EBAY` (Convex env) — eBay Browse API buy links work today without it, but won't earn commission until it's set. Also add `NEXT_PUBLIC_AFFILIATE_ID_EBAY` (same value) for the fallback search-link tag.
-4. Whenever ready: a Resend API key unblocks the occasion-reminders build below.
+3. **Register the Clerk webhook for the `signup` event** (~2 min, one-time): Clerk Dashboard → Webhooks → Add Endpoint → URL `https://perfectbundle.vercel.app/api/webhooks/clerk` → subscribe to `user.created` only → copy the endpoint's Signing Secret → set it as the `CLERK_WEBHOOK_SIGNING_SECRET` Vercel env var (no `NEXT_PUBLIC_` prefix — it's read server-side only). Redeploy after setting it. Then verify: sign up a fresh test account, check PostHog → Activity → Events for a `signup` event, and check the Clerk Dashboard webhook's Message log for a `200`.
+4. Optional revenue boost: get an eBay Partner Network **campaign ID** and set it as `AFFILIATE_ID_EBAY` (Convex env) — eBay Browse API buy links work today without it, but won't earn commission until it's set. Also add `NEXT_PUBLIC_AFFILIATE_ID_EBAY` (same value) for the fallback search-link tag.
+5. Whenever ready: a Resend API key unblocks the occasion-reminders build below.
 
 ## 5. Immediate next steps (build, unblocked)
 
 Per `docs/tasks.md` Milestone 4, next unstarted items:
 - Occasion reminders: CRUD + daily Convex cron (T-14/T-3) → Resend email (needs owner's Resend API key for live email verification)
-- Wire the `signup` PostHog event to Clerk's sign-up completion
 
-(Done 2026-07-18:
+(Done 2026-07-20:
+ • `signup` PostHog event — fires via a Clerk `user.created` webhook, exactly-once regardless
+   of signup entry point. Code-complete and tested; live firing blocked on owner's one-time
+   Clerk Dashboard webhook registration (§4 step 3). Plan:
+   `docs/superpowers/plans/2026-07-20-signup-event-clerk-webhook.md`.
+
+Done 2026-07-18:
  • Past-bundle memory — `recipientProfiles.pastItemNames` feeds an "avoid repeating"
    prompt instruction; `QuizState.profileId` threads profile→quiz→generate, kept out
    of `QuizAnswers`/cache hash; the generation-cache key folds in `profileId` so a

@@ -107,7 +107,7 @@
 - [x] P1 Clerk integration — email auth live in production (`src/proxy.ts`, `ClerkProvider`, sign-in/sign-up pages, site header). Google OAuth still needs enabling in the Clerk dashboard (Social Connections tab) — not done yet
 - [x] P1 Save bundle (guest → signup upsell at save action) — `savedBundles` table + Convex CRUD, `SaveButton` opens Clerk modal for guests / toggles for members; Convex↔Clerk auth wired (`convex/auth.config.ts`, `ConvexProviderWithClerk`, "convex" JWT template w/ `aud` claim)
 - [x] P1 "My bundles" page — `/my-bundles`, header link for signed-in users
-- [~] P1 Events: `bundle_saved` fires on save. `signup` event NOT yet wired (Clerk sign-up completion isn't currently tracked → PostHog) — backlog
+- [x] P1 Events: `bundle_saved` fires on save. `signup` fires via a Clerk `user.created` webhook (`src/app/api/webhooks/clerk/route.ts`) — server-truth, exactly-once regardless of signup entry point (header button, save-upsell modal, or `/sign-up` page). **Owner action required before this is live**: add a webhook endpoint in the Clerk Dashboard (Webhooks → Add Endpoint) pointing at `https://perfectbundle.vercel.app/api/webhooks/clerk`, subscribed to `user.created`, then copy its Signing Secret into the `CLERK_WEBHOOK_SIGNING_SECRET` Vercel env var.
 
 > **Monetization strategy:** see `docs/monetization.md` (affiliate-first, phased, $0-to-run).
 
