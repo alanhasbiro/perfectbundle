@@ -91,47 +91,51 @@ export function BundleCard({
           const links = buildRetailerLinks(item.searchQuery, country, urgency);
           return (
             <li key={item.name} className="rounded-xl border border-foreground/10 p-4">
-              {item.imageUrl ? (
-                <div className="mb-3">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.imageUrl}
-                    alt={item.name}
-                    loading="lazy"
-                    className="h-40 w-full rounded-lg object-cover"
-                  />
-                  {item.imageIsRepresentative ? (
-                    <p className="mt-1 text-xs opacity-50">
-                      Representative image
-                      {item.imageCreditName ? (
-                        <>
-                          {" · Photo by "}
-                          {item.imageCreditUrl ? (
-                            <a
-                              href={item.imageCreditUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="underline hover:opacity-80"
-                            >
-                              {item.imageCreditName}
-                            </a>
-                          ) : (
-                            item.imageCreditName
-                          )}
-                          {item.imageSource === "unsplash"
-                            ? " on Unsplash"
-                            : item.imageSource === "pexels"
-                              ? " on Pexels"
-                              : ""}
-                        </>
-                      ) : null}
-                    </p>
-                  ) : null}
+              <div className="flex gap-3">
+                {item.imageUrl ? (
+                  <div className="shrink-0">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.imageUrl}
+                      alt={item.name}
+                      loading="lazy"
+                      className="h-24 w-24 rounded-lg object-cover"
+                    />
+                  </div>
+                ) : null}
+                <div className="min-w-0 flex-1">
+                  <p className="font-medium">{item.name}</p>
+                  <p className="mt-1 text-sm opacity-70">{item.description}</p>
+                  <p className="mt-1 text-sm italic opacity-60">{item.why}</p>
                 </div>
+              </div>
+              {item.imageIsRepresentative ? (
+                <p className="mt-2 text-xs opacity-50">
+                  Representative image
+                  {item.imageCreditName ? (
+                    <>
+                      {" · Photo by "}
+                      {item.imageCreditUrl ? (
+                        <a
+                          href={item.imageCreditUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="underline hover:opacity-80"
+                        >
+                          {item.imageCreditName}
+                        </a>
+                      ) : (
+                        item.imageCreditName
+                      )}
+                      {item.imageSource === "unsplash"
+                        ? " on Unsplash"
+                        : item.imageSource === "pexels"
+                          ? " on Pexels"
+                          : ""}
+                    </>
+                  ) : null}
+                </p>
               ) : null}
-              <p className="font-medium">{item.name}</p>
-              <p className="mt-1 text-sm opacity-70">{item.description}</p>
-              <p className="mt-1 text-sm italic opacity-60">{item.why}</p>
               <p className="mt-2 text-sm font-medium">
                 {item.productPrice ? item.productPrice : item.estPriceRange}
                 {item.productPrice ? (

@@ -78,6 +78,16 @@ export function formatEbayPrice(value: string, currency: string): string {
   return symbol ? `${symbol}${value}` : `${value} ${currency}`;
 }
 
+// eBay's Browse API returns a small default thumbnail (e.g. .../s-l225.jpg,
+// 225px) meant for search-result grids. Its image CDN serves the same photo
+// at other sizes by swapping the "s-lNNN" token in the filename — bumping it
+// avoids visibly blurry upscaling when the card displays it larger than 225px.
+const EBAY_IMAGE_SIZE_PATTERN = /\/s-l\d+(\.\w+)$/;
+
+export function upscaleEbayImageUrl(url: string, targetSize = 500): string {
+  return url.replace(EBAY_IMAGE_SIZE_PATTERN, `/s-l${targetSize}$1`);
+}
+
 function asRecord(json: unknown): Record<string, unknown> | null {
   return typeof json === "object" && json !== null ? (json as Record<string, unknown>) : null;
 }
@@ -159,7 +169,7 @@ export function parseEbayItemSummary(json: unknown): ProductMedia | null {
     return null;
   }
   return {
-    imageUrl,
+    imageUrl: upscaleEbayImageUrl(imageUrl),
     productUrl,
     productPrice: formatEbayPrice(priceValue, priceCurrency),
     productMerchant: "eBay",

@@ -7,6 +7,7 @@ import {
   ebayMarketplaceForCountry,
   formatEbayPrice,
   chooseItemMedia,
+  upscaleEbayImageUrl,
   type ProductMedia,
   type StockImage,
 } from "./media";
@@ -111,6 +112,26 @@ describe("formatEbayPrice", () => {
   });
 });
 
+describe("upscaleEbayImageUrl", () => {
+  it("swaps eBay's CDN size token for a larger one", () => {
+    expect(upscaleEbayImageUrl("https://i.ebayimg.com/images/g/abc/s-l225.jpg")).toBe(
+      "https://i.ebayimg.com/images/g/abc/s-l500.jpg"
+    );
+  });
+
+  it("accepts a custom target size", () => {
+    expect(upscaleEbayImageUrl("https://i.ebayimg.com/images/g/abc/s-l64.jpg", 960)).toBe(
+      "https://i.ebayimg.com/images/g/abc/s-l960.jpg"
+    );
+  });
+
+  it("leaves URLs with no size token untouched", () => {
+    expect(upscaleEbayImageUrl("https://i.ebayimg.com/a.jpg")).toBe(
+      "https://i.ebayimg.com/a.jpg"
+    );
+  });
+});
+
 describe("parseEbayItemSummary", () => {
   it("extracts the first item into ProductMedia, merchant hardcoded to eBay", () => {
     const json = {
@@ -129,6 +150,22 @@ describe("parseEbayItemSummary", () => {
       productPrice: "$45.00",
       productMerchant: "eBay",
     });
+  });
+
+  it("upsizes eBay's default 225px thumbnail so it isn't blurry when displayed larger", () => {
+    const json = {
+      itemSummaries: [
+        {
+          title: "Vintage Camera",
+          price: { value: "45.00", currency: "USD" },
+          image: { imageUrl: "https://i.ebayimg.com/images/g/abc/s-l225.jpg" },
+          itemWebUrl: "https://www.ebay.com/itm/123",
+        },
+      ],
+    };
+    expect(parseEbayItemSummary(json)?.imageUrl).toBe(
+      "https://i.ebayimg.com/images/g/abc/s-l500.jpg"
+    );
   });
 
   it("prefers itemAffiliateWebUrl over itemWebUrl when both are present", () => {
