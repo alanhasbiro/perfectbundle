@@ -201,15 +201,21 @@ CLERK_SECRET_KEY=
 # Email (M4)
 RESEND_API_KEY=            # Convex env
 
-# Product images & data (see specs/2026-07-18-product-data-and-images-design.md)
-PEXELS_API_KEY=           # Convex env; representative item images (Phase 1). Unset = no-op. Pexels keys are ~56 chars
-SOVRN_SITE_API_KEY=       # Convex env; goes in the Sovrn Product API URL path ({site-api-key})
-SOVRN_SECRET_KEY=         # Convex env; goes in the Sovrn auth header ("authorization: secret <key>")
+# Representative images — Unsplash primary, Pexels fallback (Convex env; unset = no-op)
+UNSPLASH_ACCESS_KEY=      # header: "Authorization: Client-ID <key>". Attribution REQUIRED by their terms
+PEXELS_API_KEY=           # header: "Authorization: <key>". Fallback when Unsplash has no match
 
-# Affiliate tags (config, empty until approved)
-AFFILIATE_TAG_AMAZON=
-AFFILIATE_ID_EBAY=
-AFFILIATE_ID_AWIN=
+# Real product data (Sovrn aggregator — optional now that eBay/Amazon are approved)
+SOVRN_SITE_API_KEY=       # goes in the Sovrn Product API URL path ({site-api-key})
+SOVRN_SECRET_KEY=         # goes in the Sovrn auth header ("authorization: secret <key>")
+
+# eBay (APPROVED 2026-07-18) — Browse API for real product photos + direct links
+EBAY_CLIENT_ID=           # a.k.a. App ID; OAuth client-credentials flow
+EBAY_CLIENT_SECRET=       # a.k.a. Cert ID
+
+# Affiliate tags (Amazon + eBay approved 2026-07-18; Etsy REMOVED — app rejected)
+AFFILIATE_TAG_AMAZON=     # Associates store/tracking id, appended as ?tag=
+AFFILIATE_ID_EBAY=        # EPN campaign id, appended as ?campid=
 ```
 
 ### References
