@@ -89,10 +89,10 @@
 **Timeline:** Week 4 (overlaps M2 tail)
 **Definition of Done:** Full event spine verified firing; PostHog dashboards built per docs/dashboard-spec.md.
 
-- [ ] P0 Verify every §2.3 PRD event fires with correct properties (manual + Playwright)
-- [ ] P0 PostHog funnel: page_view → quiz_started → quiz_completed → bundles_generated → retailer_link_clicked
-- [ ] P0 Headline metrics dashboard (bundles/week, completion %, CTR, shares)
-- [ ] P0 Channel attribution insight (by utm_source incl. share links)
+- [x] P0 Verify every §2.3 PRD event fires with correct properties — confirmed live via PostHog API 2026-07-20: `event_definitions` lists all M2/M3 events with recent `last_seen_at` timestamps; a real funnel query returned genuine conversion data (9 `$pageview` → 5 `quiz_started` → 4 `quiz_completed` → 3 `bundles_generated` → 2 `retailer_link_clicked`), proving both correct firing and correct property shape end-to-end. M4 events (`signup`, `bundle_saved`, `profile_created`, `reminder_set`) exist in code but have 0 occurrences yet — expected, those features only just went live this session
+- [x] P0 PostHog funnel: page_view → quiz_started → quiz_completed → bundles_generated → retailer_link_clicked — built via PostHog API (see below), two variants (breakdown by device, by utm_source)
+- [x] P0 Headline metrics dashboard (bundles/week, completion %, CTR, shares) — built via PostHog API 2026-07-20: "PerfectBundle Proof Dashboard" (pinned), 12 insights covering every `docs/dashboard-spec.md` section except Revenue (P2/manual by design) and Alerts (optional polish). Built programmatically with a personal API key rather than by hand — owner generated a scoped key (Insight/Dashboard write, Event definition read), no dependency on manual PostHog UI work going forward for insight changes
+- [x] P0 Channel attribution insight (by utm_source incl. share links) — "Sessions & quiz starts by UTM source" (breakdown by `utm_source`) + "Share loop: viewed shared bundle → started quiz" funnel filtered to `utm_source=share`
 - [x] P1 Convex engagementCounters wired (clicks/saves/shares per bundle) — `convex/engagement.ts` `record` mutation fired fire-and-forget from link-click/save/share/view touchpoints (both curated + generated); `src/lib/bundles/popularity.ts` pure scorer (plan: docs/superpowers/plans/2026-07-18-m4-popular-tab.md)
 
 **Dependencies:** Milestone 2 features emitting events

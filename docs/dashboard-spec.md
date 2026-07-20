@@ -2,6 +2,8 @@
 
 Built in **PostHog (free tier)** — no custom dashboard code in MVP. Purpose: prove the app works, weekly.
 
+> **Implemented 2026-07-20** as "PerfectBundle Proof Dashboard" (pinned in PostHog), built via the PostHog REST API with a scoped personal API key rather than by hand. Covers every section below except §6 Revenue (stays manual/P2 by design) and the Alerts section (optional, not set up). The "p90 latency" line under §4 was dropped — `bundles_generated` never actually captured a latency property (only `cache_hit`/`budget_band`), so add that property to the event first if you want the tile. See `docs/checkpoint.md` "3. Analytics" for the full build log.
+
 ## 1. Headline Metrics (top row, weekly, vs previous week)
 | Tile | Definition | Target |
 |------|------------|--------|
