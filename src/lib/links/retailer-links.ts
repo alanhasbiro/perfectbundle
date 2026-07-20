@@ -1,7 +1,9 @@
 // NOTE: keep this file free of React/Next imports — reused by mobile later.
 
+// NOTE: Etsy was removed 2026-07-18 — our Etsy developer app was rejected, so we
+// neither link to nor fetch product data from them. Amazon + eBay are approved.
 export interface RetailerLink {
-  retailer: "amazon" | "etsy" | "ebay";
+  retailer: "amazon" | "ebay";
   url: string;
   label: string;
 }
@@ -43,11 +45,6 @@ function buildAmazonUrl(query: string, country: string, urgency: string): string
   return url;
 }
 
-function buildEtsyUrl(query: string): string {
-  const params = new URLSearchParams({ q: query });
-  return `https://www.etsy.com/search?${params.toString()}`;
-}
-
 function buildEbayUrl(query: string): string {
   const params = new URLSearchParams({ _nkw: query });
   const campid = process.env.AFFILIATE_ID_EBAY;
@@ -66,7 +63,6 @@ export function buildRetailerLinks(
       url: buildAmazonUrl(searchQuery, country, urgency),
       label: "Find it on Amazon",
     },
-    { retailer: "etsy", url: buildEtsyUrl(searchQuery), label: "Find it on Etsy" },
     { retailer: "ebay", url: buildEbayUrl(searchQuery), label: "Find it on eBay" },
   ];
 }

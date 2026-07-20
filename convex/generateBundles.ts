@@ -4,7 +4,13 @@ import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
 import { buildBundlePrompt } from "../src/lib/engine/prompt";
 import { parseBundleResponse } from "../src/lib/engine/parse-response";
-import { buildStockImageQuery, parsePexelsResponse, chooseItemMedia } from "../src/lib/engine/media";
+import {
+  buildStockImageQuery,
+  parseUnsplashResponse,
+  parsePexelsResponse,
+  chooseItemMedia,
+  type StockImage,
+} from "../src/lib/engine/media";
 import type { BundleContent } from "../src/lib/engine/schemas";
 import { hashQuizAnswers } from "../src/lib/quiz/hash";
 import type { QuizAnswers } from "../src/lib/quiz/types";
@@ -98,9 +104,24 @@ async function callGemini(prompt: string): Promise<string | null> {
   return json.candidates?.[0]?.content?.parts?.[0]?.text ?? null;
 }
 
-// Fetches a single representative photo URL for a search phrase from Pexels,
-// or null on any failure / no key. Never throws — media is best-effort.
-async function fetchStockImage(query: string): Promise<string | null> {
+// Unsplash is the primary stock-image source; Pexels is the fallback. Running
+// both doubles our free-tier headroom and covers gaps where one has no match.
+// Each returns null on any failure / missing key — media is best-effort and must
+// never throw.
+async function fetchUnsplashImage(query: string): Promise<StockImage | null> {
+  const apiKey = process.env.UNSPLASH_ACCESS_KEY;
+  if (!apiKey) return null;
+  try {
+    const url = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1`;
+    const res = await fetch(url, { headers: { Authorization: `Client-ID ${apiKey}` } });
+    if (!res.ok) return null;
+    return parseUnsplashResponse(await res.json());
+  } catch {
+    return null;
+  }
+}
+
+async function fetchPexelsImage(query: string): Promise<StockImage | null> {
   const apiKey = process.env.PEXELS_API_KEY;
   if (!apiKey) return null;
   try {
@@ -111,6 +132,10 @@ async function fetchStockImage(query: string): Promise<string | null> {
   } catch {
     return null;
   }
+}
+
+async function fetchStockImage(query: string): Promise<StockImage | null> {
+  return (await fetchUnsplashImage(query)) ?? (await fetchPexelsImage(query));
 }
 
 // Attaches best-effort media to every item of every bundle. Phase 1 resolves

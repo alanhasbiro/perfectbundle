@@ -7,6 +7,9 @@ export interface BundleItemLike {
   tags: string[];
   imageUrl?: string;
   imageIsRepresentative?: boolean;
+  imageCreditName?: string;
+  imageCreditUrl?: string;
+  imageSource?: string;
   productUrl?: string;
   productPrice?: string;
   productMerchant?: string;

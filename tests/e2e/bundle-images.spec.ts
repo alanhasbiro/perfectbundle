@@ -10,6 +10,15 @@ test.describe("bundle item images", () => {
     await page.goto("/popular");
     // The seeded popular bundle carries an image on its first item.
     await expect(page.getByRole("img", { name: "Popular Item One" }).first()).toBeVisible();
-    await expect(page.getByText("Representative image").first()).toBeVisible();
+    await expect(page.getByText(/Representative image/).first()).toBeVisible();
+  });
+
+  test("credits the photographer (required by Unsplash's API terms)", async ({ page }) => {
+    await page.goto("/popular");
+    const credit = page.getByRole("link", { name: "E2E Photographer" }).first();
+    await expect(credit).toBeVisible();
+    await expect(credit).toHaveAttribute("href", "https://unsplash.com/@e2e");
+    await expect(page.getByText(/Photo by/).first()).toBeVisible();
+    await expect(page.getByText(/on Unsplash/).first()).toBeVisible();
   });
 });

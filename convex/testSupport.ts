@@ -93,6 +93,9 @@ export const seedPopularBundle = mutation({
           imageUrl:
             "https://images.pexels.com/photos/1002740/pexels-photo-1002740.jpeg?auto=compress&cs=tinysrgb&h=350",
           imageIsRepresentative: true,
+          imageCreditName: "E2E Photographer",
+          imageCreditUrl: "https://unsplash.com/@e2e",
+          imageSource: "unsplash",
         },
         {
           name: "Popular Item Two",

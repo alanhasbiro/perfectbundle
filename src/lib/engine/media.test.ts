@@ -1,9 +1,11 @@
 import { describe, it, expect } from "vitest";
 import {
   buildStockImageQuery,
+  parseUnsplashResponse,
   parsePexelsResponse,
   chooseItemMedia,
   type ProductMedia,
+  type StockImage,
 } from "./media";
 
 describe("buildStockImageQuery", () => {
@@ -18,20 +20,59 @@ describe("buildStockImageQuery", () => {
   });
 });
 
+describe("parseUnsplashResponse", () => {
+  it("returns the first result's small url plus photographer credit", () => {
+    const json = {
+      results: [
+        {
+          urls: { small: "https://images.unsplash.com/a-small.jpg", regular: "https://x/reg.jpg" },
+          user: { name: "Ada Lovelace", links: { html: "https://unsplash.com/@ada" } },
+        },
+      ],
+    };
+    expect(parseUnsplashResponse(json)).toEqual({
+      url: "https://images.unsplash.com/a-small.jpg",
+      creditName: "Ada Lovelace",
+      creditUrl: "https://unsplash.com/@ada",
+      source: "unsplash",
+    });
+  });
+
+  it("returns null when there are no results or the shape is wrong", () => {
+    expect(parseUnsplashResponse({ results: [] })).toBeNull();
+    expect(parseUnsplashResponse({})).toBeNull();
+    expect(parseUnsplashResponse(null)).toBeNull();
+    expect(parseUnsplashResponse("nonsense")).toBeNull();
+  });
+
+  it("still returns the image when photographer credit is missing", () => {
+    const json = { results: [{ urls: { small: "https://images.unsplash.com/b.jpg" } }] };
+    expect(parseUnsplashResponse(json)).toEqual({
+      url: "https://images.unsplash.com/b.jpg",
+      creditName: undefined,
+      creditUrl: undefined,
+      source: "unsplash",
+    });
+  });
+});
+
 describe("parsePexelsResponse", () => {
-  it("returns the first photo's medium src", () => {
+  it("returns the first photo's medium src plus photographer credit", () => {
     const json = {
       photos: [
         {
-          src: {
-            medium: "https://images.pexels.com/a-medium.jpg",
-            large: "https://images.pexels.com/a-large.jpg",
-          },
+          src: { medium: "https://images.pexels.com/a-medium.jpg" },
+          photographer: "Grace Hopper",
+          photographer_url: "https://www.pexels.com/@grace",
         },
-        { src: { medium: "https://images.pexels.com/b-medium.jpg" } },
       ],
     };
-    expect(parsePexelsResponse(json)).toBe("https://images.pexels.com/a-medium.jpg");
+    expect(parsePexelsResponse(json)).toEqual({
+      url: "https://images.pexels.com/a-medium.jpg",
+      creditName: "Grace Hopper",
+      creditUrl: "https://www.pexels.com/@grace",
+      source: "pexels",
+    });
   });
 
   it("returns null when there are no photos", () => {
@@ -47,23 +88,33 @@ describe("chooseItemMedia", () => {
     imageUrl: "https://cdn.example.com/real.jpg",
     productUrl: "https://buy.example.com/item?aff=1",
     productPrice: "$24.00",
-    productMerchant: "Etsy",
+    productMerchant: "eBay",
   };
 
-  it("uses the real product when present (not representative)", () => {
-    expect(chooseItemMedia({ sovrn: product, stock: "https://stock/x.jpg" })).toEqual({
+  const stock: StockImage = {
+    url: "https://stock/x.jpg",
+    creditName: "Ada Lovelace",
+    creditUrl: "https://unsplash.com/@ada",
+    source: "unsplash",
+  };
+
+  it("uses the real product when present (not representative, no stock credit)", () => {
+    expect(chooseItemMedia({ sovrn: product, stock })).toEqual({
       imageUrl: "https://cdn.example.com/real.jpg",
       imageIsRepresentative: false,
       productUrl: "https://buy.example.com/item?aff=1",
       productPrice: "$24.00",
-      productMerchant: "Etsy",
+      productMerchant: "eBay",
     });
   });
 
-  it("falls back to the stock image, flagged representative", () => {
-    expect(chooseItemMedia({ sovrn: null, stock: "https://stock/x.jpg" })).toEqual({
+  it("falls back to the stock image, flagged representative, with credit", () => {
+    expect(chooseItemMedia({ sovrn: null, stock })).toEqual({
       imageUrl: "https://stock/x.jpg",
       imageIsRepresentative: true,
+      imageCreditName: "Ada Lovelace",
+      imageCreditUrl: "https://unsplash.com/@ada",
+      imageSource: "unsplash",
     });
   });
 

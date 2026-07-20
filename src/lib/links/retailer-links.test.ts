@@ -43,9 +43,14 @@ describe("buildRetailerLinks", () => {
     process.env = OLD_ENV;
   });
 
-  it("returns exactly amazon, etsy, ebay in order", () => {
+  it("returns exactly amazon, ebay in order (Etsy removed — app rejected)", () => {
     const links = buildRetailerLinks("ceramic mug", "US", "normal");
-    expect(links.map((l) => l.retailer)).toEqual(["amazon", "etsy", "ebay"]);
+    expect(links.map((l) => l.retailer)).toEqual(["amazon", "ebay"]);
+  });
+
+  it("never emits an Etsy link", () => {
+    const links = buildRetailerLinks("ceramic mug", "US", "normal");
+    expect(links.some((l) => l.url.includes("etsy.com"))).toBe(false);
   });
 
   it("URL-encodes the search query and uses the right domain per country", () => {
@@ -53,9 +58,6 @@ describe("buildRetailerLinks", () => {
     const amazon = links.find((l) => l.retailer === "amazon")!;
     expect(amazon.url).toContain("amazon.co.uk");
     expect(decodeQuery(amazon.url)).toContain("gooseneck kettle & pot");
-    const etsy = links.find((l) => l.retailer === "etsy")!;
-    expect(etsy.url).toContain("etsy.com");
-    expect(decodeQuery(etsy.url)).toContain("gooseneck kettle & pot");
     const ebay = links.find((l) => l.retailer === "ebay")!;
     expect(ebay.url).toContain("ebay.com");
     expect(decodeQuery(ebay.url)).toContain("gooseneck kettle & pot");
@@ -89,7 +91,6 @@ describe("buildRetailerLinks", () => {
   it("gives each link a human-readable label", () => {
     const links = buildRetailerLinks("mug", "US", "normal");
     expect(links.find((l) => l.retailer === "amazon")!.label).toBe("Find it on Amazon");
-    expect(links.find((l) => l.retailer === "etsy")!.label).toBe("Find it on Etsy");
     expect(links.find((l) => l.retailer === "ebay")!.label).toBe("Find it on eBay");
   });
 });

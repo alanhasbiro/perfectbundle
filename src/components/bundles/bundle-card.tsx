@@ -101,7 +101,31 @@ export function BundleCard({
                     className="h-40 w-full rounded-lg object-cover"
                   />
                   {item.imageIsRepresentative ? (
-                    <p className="mt-1 text-xs opacity-50">Representative image</p>
+                    <p className="mt-1 text-xs opacity-50">
+                      Representative image
+                      {item.imageCreditName ? (
+                        <>
+                          {" · Photo by "}
+                          {item.imageCreditUrl ? (
+                            <a
+                              href={item.imageCreditUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline hover:opacity-80"
+                            >
+                              {item.imageCreditName}
+                            </a>
+                          ) : (
+                            item.imageCreditName
+                          )}
+                          {item.imageSource === "unsplash"
+                            ? " on Unsplash"
+                            : item.imageSource === "pexels"
+                              ? " on Pexels"
+                              : ""}
+                        </>
+                      ) : null}
+                    </p>
                   ) : null}
                 </div>
               ) : null}

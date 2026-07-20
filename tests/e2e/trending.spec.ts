@@ -21,7 +21,8 @@ test.describe("trending page", () => {
     }
 
     await expect(page.getByRole("link", { name: "Find it on Amazon" }).first()).toBeVisible();
-    await expect(page.getByRole("link", { name: "Find it on Etsy" }).first()).toBeVisible();
     await expect(page.getByRole("link", { name: "Find it on eBay" }).first()).toBeVisible();
+    // Etsy removed 2026-07-18 (developer app rejected) — must not reappear.
+    await expect(page.getByRole("link", { name: /Etsy/ })).toHaveCount(0);
   });
 });
