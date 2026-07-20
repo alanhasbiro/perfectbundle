@@ -37,6 +37,47 @@ export function buildStockImageQuery(item: { searchQuery: string; name: string }
   return q.length > 0 ? q : item.name;
 }
 
+const EBAY_MARKETPLACE_BY_COUNTRY: Record<string, string> = {
+  US: "EBAY_US",
+  GB: "EBAY_GB",
+  DE: "EBAY_DE",
+  AU: "EBAY_AU",
+  CA: "EBAY_CA",
+  FR: "EBAY_FR",
+  IT: "EBAY_IT",
+  ES: "EBAY_ES",
+  NL: "EBAY_NL",
+  CH: "EBAY_CH",
+  AT: "EBAY_AT",
+  BE: "EBAY_BE",
+  IE: "EBAY_IE",
+  IN: "EBAY_IN",
+  SG: "EBAY_SG",
+  MY: "EBAY_MY",
+  PH: "EBAY_PH",
+  PL: "EBAY_PL",
+  TH: "EBAY_TH",
+  TW: "EBAY_TW",
+};
+
+export function ebayMarketplaceForCountry(country: string): string {
+  return EBAY_MARKETPLACE_BY_COUNTRY[country] ?? "EBAY_US";
+}
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: "$",
+  GBP: "£",
+  EUR: "€",
+  CAD: "$",
+  AUD: "$",
+  JPY: "¥",
+};
+
+export function formatEbayPrice(value: string, currency: string): string {
+  const symbol = CURRENCY_SYMBOLS[currency];
+  return symbol ? `${symbol}${value}` : `${value} ${currency}`;
+}
+
 function asRecord(json: unknown): Record<string, unknown> | null {
   return typeof json === "object" && json !== null ? (json as Record<string, unknown>) : null;
 }
@@ -87,20 +128,58 @@ export function parsePexelsResponse(json: unknown): StockImage | null {
   };
 }
 
+// Extracts the first item from an eBay Browse API item_summary/search
+// response into ProductMedia. Field paths: itemSummaries[].image.imageUrl,
+// .itemWebUrl (falls back from .itemAffiliateWebUrl when the request included
+// an affiliate campaign id), .price.value/.currency. Merchant is always shown
+// as "eBay" (the seller username isn't a recognizable "buy at X" merchant).
+export function parseEbayItemSummary(json: unknown): ProductMedia | null {
+  const root = asRecord(json);
+  if (!root) return null;
+  const items = root.itemSummaries;
+  if (!Array.isArray(items) || items.length === 0) return null;
+  const first = items[0] as {
+    image?: { imageUrl?: unknown };
+    itemWebUrl?: unknown;
+    itemAffiliateWebUrl?: unknown;
+    price?: { value?: unknown; currency?: unknown };
+  } | null;
+  const imageUrl = first?.image?.imageUrl;
+  const productUrl = first?.itemAffiliateWebUrl ?? first?.itemWebUrl;
+  const priceValue = first?.price?.value;
+  const priceCurrency = first?.price?.currency;
+  if (
+    typeof imageUrl !== "string" ||
+    imageUrl.length === 0 ||
+    typeof productUrl !== "string" ||
+    productUrl.length === 0 ||
+    typeof priceValue !== "string" ||
+    typeof priceCurrency !== "string"
+  ) {
+    return null;
+  }
+  return {
+    imageUrl,
+    productUrl,
+    productPrice: formatEbayPrice(priceValue, priceCurrency),
+    productMerchant: "eBay",
+  };
+}
+
 // First-match-wins media layering: a real purchasable product (Sovrn/eBay) beats
 // a representative stock photo. A real product photo is NOT representative and
 // carries no photographer credit; a stock photo IS representative and does.
 export function chooseItemMedia(sources: {
-  sovrn: ProductMedia | null;
+  realProduct: ProductMedia | null;
   stock: StockImage | null;
 }): ItemMedia {
-  if (sources.sovrn) {
+  if (sources.realProduct) {
     return {
-      imageUrl: sources.sovrn.imageUrl,
+      imageUrl: sources.realProduct.imageUrl,
       imageIsRepresentative: false,
-      productUrl: sources.sovrn.productUrl,
-      productPrice: sources.sovrn.productPrice,
-      productMerchant: sources.sovrn.productMerchant,
+      productUrl: sources.realProduct.productUrl,
+      productPrice: sources.realProduct.productPrice,
+      productMerchant: sources.realProduct.productMerchant,
     };
   }
   if (sources.stock) {

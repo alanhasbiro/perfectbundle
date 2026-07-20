@@ -3,6 +3,9 @@ import {
   buildStockImageQuery,
   parseUnsplashResponse,
   parsePexelsResponse,
+  parseEbayItemSummary,
+  ebayMarketplaceForCountry,
+  formatEbayPrice,
   chooseItemMedia,
   type ProductMedia,
   type StockImage,
@@ -83,6 +86,78 @@ describe("parsePexelsResponse", () => {
   });
 });
 
+describe("ebayMarketplaceForCountry", () => {
+  it("maps known countries to their eBay marketplace id", () => {
+    expect(ebayMarketplaceForCountry("US")).toBe("EBAY_US");
+    expect(ebayMarketplaceForCountry("GB")).toBe("EBAY_GB");
+    expect(ebayMarketplaceForCountry("DE")).toBe("EBAY_DE");
+    expect(ebayMarketplaceForCountry("AU")).toBe("EBAY_AU");
+  });
+
+  it("falls back to EBAY_US for unmapped countries", () => {
+    expect(ebayMarketplaceForCountry("ZZ")).toBe("EBAY_US");
+  });
+});
+
+describe("formatEbayPrice", () => {
+  it("uses a currency symbol when known", () => {
+    expect(formatEbayPrice("24.99", "USD")).toBe("$24.99");
+    expect(formatEbayPrice("19.50", "GBP")).toBe("£19.50");
+    expect(formatEbayPrice("30.00", "EUR")).toBe("€30.00");
+  });
+
+  it("falls back to 'value CURRENCY' for unknown currencies", () => {
+    expect(formatEbayPrice("100", "SEK")).toBe("100 SEK");
+  });
+});
+
+describe("parseEbayItemSummary", () => {
+  it("extracts the first item into ProductMedia, merchant hardcoded to eBay", () => {
+    const json = {
+      itemSummaries: [
+        {
+          title: "Vintage Camera",
+          price: { value: "45.00", currency: "USD" },
+          image: { imageUrl: "https://i.ebayimg.com/a.jpg" },
+          itemWebUrl: "https://www.ebay.com/itm/123",
+        },
+      ],
+    };
+    expect(parseEbayItemSummary(json)).toEqual({
+      imageUrl: "https://i.ebayimg.com/a.jpg",
+      productUrl: "https://www.ebay.com/itm/123",
+      productPrice: "$45.00",
+      productMerchant: "eBay",
+    });
+  });
+
+  it("prefers itemAffiliateWebUrl over itemWebUrl when both are present", () => {
+    const json = {
+      itemSummaries: [
+        {
+          title: "Vintage Camera",
+          price: { value: "45.00", currency: "USD" },
+          image: { imageUrl: "https://i.ebayimg.com/a.jpg" },
+          itemWebUrl: "https://www.ebay.com/itm/123",
+          itemAffiliateWebUrl: "https://www.ebay.com/itm/123?campid=aff",
+        },
+      ],
+    };
+    expect(parseEbayItemSummary(json)?.productUrl).toBe(
+      "https://www.ebay.com/itm/123?campid=aff"
+    );
+  });
+
+  it("returns null when there are no items or required fields are missing", () => {
+    expect(parseEbayItemSummary({ itemSummaries: [] })).toBeNull();
+    expect(parseEbayItemSummary({})).toBeNull();
+    expect(parseEbayItemSummary(null)).toBeNull();
+    expect(
+      parseEbayItemSummary({ itemSummaries: [{ title: "No image or url" }] })
+    ).toBeNull();
+  });
+});
+
 describe("chooseItemMedia", () => {
   const product: ProductMedia = {
     imageUrl: "https://cdn.example.com/real.jpg",
@@ -99,7 +174,7 @@ describe("chooseItemMedia", () => {
   };
 
   it("uses the real product when present (not representative, no stock credit)", () => {
-    expect(chooseItemMedia({ sovrn: product, stock })).toEqual({
+    expect(chooseItemMedia({ realProduct: product, stock })).toEqual({
       imageUrl: "https://cdn.example.com/real.jpg",
       imageIsRepresentative: false,
       productUrl: "https://buy.example.com/item?aff=1",
@@ -109,7 +184,7 @@ describe("chooseItemMedia", () => {
   });
 
   it("falls back to the stock image, flagged representative, with credit", () => {
-    expect(chooseItemMedia({ sovrn: null, stock })).toEqual({
+    expect(chooseItemMedia({ realProduct: null, stock })).toEqual({
       imageUrl: "https://stock/x.jpg",
       imageIsRepresentative: true,
       imageCreditName: "Ada Lovelace",
@@ -119,6 +194,6 @@ describe("chooseItemMedia", () => {
   });
 
   it("returns empty media when nothing is available", () => {
-    expect(chooseItemMedia({ sovrn: null, stock: null })).toEqual({});
+    expect(chooseItemMedia({ realProduct: null, stock: null })).toEqual({});
   });
 });
