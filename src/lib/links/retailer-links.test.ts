@@ -35,8 +35,8 @@ describe("buildRetailerLinks", () => {
   const OLD_ENV = process.env;
   beforeEach(() => {
     process.env = { ...OLD_ENV };
-    delete process.env.AFFILIATE_TAG_AMAZON;
-    delete process.env.AFFILIATE_ID_EBAY;
+    delete process.env.NEXT_PUBLIC_AFFILIATE_TAG_AMAZON;
+    delete process.env.NEXT_PUBLIC_AFFILIATE_ID_EBAY;
     delete process.env.AFFILIATE_ID_AWIN;
   });
   afterEach(() => {
@@ -72,8 +72,8 @@ describe("buildRetailerLinks", () => {
   });
 
   it("includes affiliate tag params when env vars are set", () => {
-    process.env.AFFILIATE_TAG_AMAZON = "pbtag-20";
-    process.env.AFFILIATE_ID_EBAY = "pb-ebay-123";
+    process.env.NEXT_PUBLIC_AFFILIATE_TAG_AMAZON = "pbtag-20";
+    process.env.NEXT_PUBLIC_AFFILIATE_ID_EBAY = "pb-ebay-123";
     const links = buildRetailerLinks("mug", "US", "normal");
     const amazon = links.find((l) => l.retailer === "amazon")!;
     expect(amazon.url).toContain("tag=pbtag-20");

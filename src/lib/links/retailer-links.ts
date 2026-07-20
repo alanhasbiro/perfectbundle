@@ -35,10 +35,14 @@ export function amazonDomainForCountry(country: string): string {
 // See: https://www.amazon.com/s?rh=p_76:<refinement id>
 const AMAZON_FAST_SHIPPING_PARAM = "rh=p_76%3A2661601011"; // "Get It Fast" refinement
 
+// NOTE: these must be NEXT_PUBLIC_-prefixed — this module is called from a
+// "use client" component (BundleCard), and Next.js only inlines env vars with
+// that prefix into the browser bundle. A bare `AFFILIATE_TAG_AMAZON` here is
+// always undefined at runtime in the browser (found + fixed 2026-07-19).
 function buildAmazonUrl(query: string, country: string, urgency: string): string {
   const domain = amazonDomainForCountry(country);
   const params = new URLSearchParams({ k: query });
-  const tag = process.env.AFFILIATE_TAG_AMAZON;
+  const tag = process.env.NEXT_PUBLIC_AFFILIATE_TAG_AMAZON;
   if (tag) params.set("tag", tag);
   let url = `https://www.${domain}/s?${params.toString()}`;
   if (urgency === "fast") url += `&${AMAZON_FAST_SHIPPING_PARAM}`;
@@ -47,7 +51,7 @@ function buildAmazonUrl(query: string, country: string, urgency: string): string
 
 function buildEbayUrl(query: string): string {
   const params = new URLSearchParams({ _nkw: query });
-  const campid = process.env.AFFILIATE_ID_EBAY;
+  const campid = process.env.NEXT_PUBLIC_AFFILIATE_ID_EBAY;
   if (campid) params.set("campid", campid);
   return `https://www.ebay.com/sch/i.html?${params.toString()}`;
 }

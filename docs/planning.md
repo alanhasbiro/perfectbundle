@@ -213,9 +213,17 @@ SOVRN_SECRET_KEY=         # goes in the Sovrn auth header ("authorization: secre
 EBAY_CLIENT_ID=           # a.k.a. App ID; OAuth client-credentials flow
 EBAY_CLIENT_SECRET=       # a.k.a. Cert ID
 
-# Affiliate tags (Amazon + eBay approved 2026-07-18; Etsy REMOVED — app rejected)
-AFFILIATE_TAG_AMAZON=     # Associates store/tracking id, appended as ?tag=
-AFFILIATE_ID_EBAY=        # EPN campaign id, appended as ?campid=
+# Affiliate tags for OUTBOUND SEARCH LINKS (client-side — MUST be NEXT_PUBLIC_
+# prefixed, this module runs in the browser via BundleCard). Amazon + eBay
+# approved 2026-07-18; Etsy REMOVED — app rejected.
+NEXT_PUBLIC_AFFILIATE_TAG_AMAZON=   # Associates store/tracking id, appended as ?tag=
+NEXT_PUBLIC_AFFILIATE_ID_EBAY=      # EPN campaign id, appended as ?campid= (fallback search link only)
+
+# eBay Partner Network campaign id for REAL product buy links (server-side,
+# Convex env — separate from the NEXT_PUBLIC_ one above, which only tags the
+# fallback search link). Optional: without it, eBay Browse API links still
+# work, just untagged for commission.
+AFFILIATE_ID_EBAY=
 ```
 
 ### References
