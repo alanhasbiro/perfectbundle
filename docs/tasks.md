@@ -49,7 +49,7 @@
 - [x] P0 Convex action: quiz → Gemini Flash call → validated JSON (1 retry on invalid) — `convex/generateBundles.ts` (`generate` action), model `gemini-flash-latest`
 - [x] P0 Generation cache by normalized quiz hash — `src/lib/quiz/hash.ts` (order-independent FNV-1a) + `convex/generationCache.ts`, verified cache hit on repeat quiz
 - [x] P0 Per-IP/user rate limiting — `convex/rateLimit.ts`, 10/hour fixed window
-- [~] P0 Quota-exhausted fallback → trending bundles + friendly message — engine returns typed `{status:"failed"|"rate_limited"}`; UI wiring to show trending on failure is a results-UI-sprint task
+- [x] P0 Quota-exhausted fallback → trending bundles + friendly message — engine returns typed `{status:"failed"|"rate_limited"}`; UI wiring done, see Bundle Results UI section below
 - [x] P0 Golden-fixture eval suite (budget bounds, exclusions, age rails) — `src/lib/engine/golden-fixtures.test.ts`
 - [x] P0 Events: bundles_generated, bundle_generation_failed — already in `src/lib/analytics.ts` union from M1; fired by results UI next sprint
 - Verified live end-to-end with real Gemini call (2026-07-17): 3 coherent themed bundles, budget respected (£35-53 vs £50 target), "candles" exclusion respected across all 9 items, correct GBP currency.
@@ -104,10 +104,10 @@
 **Definition of Done:** Sign up, save, profiles, reminders all work in production; Popular tab live.
 
 ### Auth & Saved Bundles (F7)
-- [x] P1 Clerk integration — email auth live in production (`src/proxy.ts`, `ClerkProvider`, sign-in/sign-up pages, site header). Google OAuth still needs enabling in the Clerk dashboard (Social Connections tab) — not done yet
+- [x] P1 Clerk integration — email auth live in production (`src/proxy.ts`, `ClerkProvider`, sign-in/sign-up pages, site header). Google OAuth confirmed live 2026-07-20 (`connection_oauth_google.enabled: true`, verified via both `clerk config pull` and the live Frontend API `/v1/environment`) — uses Clerk's shared dev credentials, no Google Cloud setup needed since the app still runs on Clerk's dev instance in production
 - [x] P1 Save bundle (guest → signup upsell at save action) — `savedBundles` table + Convex CRUD, `SaveButton` opens Clerk modal for guests / toggles for members; Convex↔Clerk auth wired (`convex/auth.config.ts`, `ConvexProviderWithClerk`, "convex" JWT template w/ `aud` claim)
 - [x] P1 "My bundles" page — `/my-bundles`, header link for signed-in users
-- [x] P1 Events: `bundle_saved` fires on save. `signup` fires via a Clerk `user.created` webhook (`src/app/api/webhooks/clerk/route.ts`) — server-truth, exactly-once regardless of signup entry point (header button, save-upsell modal, or `/sign-up` page). **Owner action required before this is live**: add a webhook endpoint in the Clerk Dashboard (Webhooks → Add Endpoint) pointing at `https://perfectbundle.vercel.app/api/webhooks/clerk`, subscribed to `user.created`, then copy its Signing Secret into the `CLERK_WEBHOOK_SIGNING_SECRET` Vercel env var.
+- [x] P1 Events: `bundle_saved` fires on save. `signup` fires via a Clerk `user.created` webhook (`src/app/api/webhooks/clerk/route.ts`) — server-truth, exactly-once regardless of signup entry point (header button, save-upsell modal, or `/sign-up` page). Verified fully working end-to-end 2026-07-20 (webhook registered, signing secret pushed to Vercel, confirmed via a live test signup landing in PostHog).
 
 > **Monetization strategy:** see `docs/monetization.md` (affiliate-first, phased, $0-to-run).
 
