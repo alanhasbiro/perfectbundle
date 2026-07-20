@@ -8,8 +8,11 @@ import {
   buildStockImageQuery,
   parseUnsplashResponse,
   parsePexelsResponse,
+  parseEbayItemSummary,
+  ebayMarketplaceForCountry,
   chooseItemMedia,
   type StockImage,
+  type ProductMedia,
 } from "../src/lib/engine/media";
 import type { BundleContent } from "../src/lib/engine/schemas";
 import { hashQuizAnswers } from "../src/lib/quiz/hash";
@@ -138,17 +141,77 @@ async function fetchStockImage(query: string): Promise<StockImage | null> {
   return (await fetchUnsplashImage(query)) ?? (await fetchPexelsImage(query));
 }
 
-// Attaches best-effort media to every item of every bundle. Phase 1 resolves
-// only representative stock images (sovrn:null). Any per-item failure yields no
-// media for that item; the overall generation is never blocked.
-async function enrichBundlesWithMedia(bundles: BundleContent[]): Promise<BundleContent[]> {
+// eBay OAuth2 client-credentials grant. One token is fetched per generation
+// call (not per item) — simpler than persisting a token cache across Convex
+// action invocations, and well within eBay's free-tier call limits at this
+// app's scale (see docs/superpowers/plans/2026-07-19-ebay-real-products-affiliate-fix.md).
+// Convex's default runtime has no Node `Buffer`; `btoa` (a standard Web
+// global) covers the ASCII-only Basic-auth header eBay expects.
+async function getEbayToken(): Promise<string | null> {
+  const clientId = process.env.EBAY_CLIENT_ID;
+  const clientSecret = process.env.EBAY_CLIENT_SECRET;
+  if (!clientId || !clientSecret) return null;
+  try {
+    const basic = btoa(`${clientId}:${clientSecret}`);
+    const res = await fetch("https://api.ebay.com/identity/v1/oauth2/token", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: `Basic ${basic}`,
+      },
+      body: "grant_type=client_credentials&scope=https%3A%2F%2Fapi.ebay.com%2Foauth%2Fapi_scope",
+    });
+    if (!res.ok) return null;
+    const json = (await res.json()) as { access_token?: string };
+    return json.access_token ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// Searches eBay's Browse API for a real, buyable product matching the query.
+// Never throws — a failure here means the item falls back to a representative
+// stock image instead, exactly like every other media provider in this file.
+async function fetchEbayProduct(
+  query: string,
+  country: string,
+  token: string
+): Promise<ProductMedia | null> {
+  try {
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${token}`,
+      "X-EBAY-C-MARKETPLACE-ID": ebayMarketplaceForCountry(country),
+    };
+    const campaignId = process.env.AFFILIATE_ID_EBAY;
+    if (campaignId) headers["X-EBAY-C-ENDUSERCTX"] = `affiliateCampaignId=${campaignId}`;
+    const url = `https://api.ebay.com/buy/browse/v1/item_summary/search?q=${encodeURIComponent(query)}&limit=1`;
+    const res = await fetch(url, { headers });
+    if (!res.ok) return null;
+    return parseEbayItemSummary(await res.json());
+  } catch {
+    return null;
+  }
+}
+
+// Attaches best-effort media to every item of every bundle: a real eBay
+// product (photo + direct link + price) when available, else a representative
+// stock image. Any per-provider failure yields no media for that item; the
+// overall generation is never blocked.
+async function enrichBundlesWithMedia(
+  bundles: BundleContent[],
+  country: string
+): Promise<BundleContent[]> {
+  const ebayToken = await getEbayToken();
   return Promise.all(
     bundles.map(async (bundle) => ({
       ...bundle,
       items: await Promise.all(
         bundle.items.map(async (item) => {
+          const realProduct = ebayToken
+            ? await fetchEbayProduct(buildStockImageQuery(item), country, ebayToken)
+            : null;
           const stock = await fetchStockImage(buildStockImageQuery(item));
-          const media = chooseItemMedia({ sovrn: null, stock });
+          const media = chooseItemMedia({ realProduct, stock });
           return { ...item, ...media };
         })
       ),
@@ -228,7 +291,7 @@ export const generate = action({
       return { status: "failed", reason: parsed.error };
     }
 
-    const enrichedBundles = await enrichBundlesWithMedia(parsed.bundles);
+    const enrichedBundles = await enrichBundlesWithMedia(parsed.bundles, quiz.country);
 
     const bundleIds: Id<"bundles">[] = await ctx.runMutation(internal.bundles.storeGenerated, {
       quizHash,
