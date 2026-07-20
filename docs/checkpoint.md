@@ -8,10 +8,10 @@
 
 | Metric | Value |
 |--------|-------|
-| **Overall Progress** | ~73% (M1 + M2 P0 done; production Convex deployed; M5 E2E core + cross-browser + a11y green; M3 PostHog config fixed + engagementCounters wired; M4 auth/save/profiles + past-bundle memory + Popular tab done) |
-| **Current Phase** | M4 accounts & retention (save, profiles, recipient prefill, past-bundle memory, Popular tab done; occasion reminders + signup event still to build) |
+| **Overall Progress** | ~76% (M1 + M2 P0 done; production Convex deployed; M5 E2E core + cross-browser + a11y green; M3 PostHog config fixed + engagementCounters wired; M4 auth/save/profiles + past-bundle memory + Popular tab done; real eBay product photos/links/prices live) |
+| **Current Phase** | M4 accounts & retention (save, profiles, recipient prefill, past-bundle memory, Popular tab done; occasion reminders + signup event still to build). Real product data (eBay) shipped and verified live. |
 | **On Track?** | ✅ Yes |
-| **Last Updated** | 2026-07-18 |
+| **Last Updated** | 2026-07-19 |
 | **Last Commit** | see change log |
 
 ### Tasks Status
@@ -20,11 +20,11 @@ See `docs/tasks.md` for the live task list. Summary:
 
 | Metric | Value |
 |--------|-------|
-| **Active Milestone** | M4 accounts & retention (save/profiles/past-bundle memory done; reminders + Popular tab + signup event next) |
-| **Tasks Complete** | 49 / ~85 |
+| **Active Milestone** | M4 accounts & retention (save/profiles/past-bundle memory/Popular tab done; reminders + signup event next) |
+| **Tasks Complete** | 53 / ~85 |
 | **Tasks In Progress** | 0 |
-| **Tasks Blocked** | 2 (M3 dashboards manual; real-photo/direct-links on retailer API approvals) |
-| **Active Plan** | `docs/superpowers/plans/2026-07-18-m4-past-bundle-memory.md` (complete) |
+| **Tasks Blocked** | 1 (M3 dashboards — manual PostHog UI setup only) |
+| **Active Plan** | `docs/superpowers/plans/2026-07-19-ebay-real-products-affiliate-fix.md` (complete) |
 
 ### Progress by Milestone
 
@@ -33,7 +33,7 @@ See `docs/tasks.md` for the live task list. Summary:
 | 1. Foundation | ✅ Complete | 100% | Live at perfectbundle.vercel.app; **production Convex deployed** (was local-only, fixed this session); PostHog key + Sentry still deferred (non-blocking) |
 | 2. Core MVP (P0) | ✅ Complete | 95% | Quiz, engine, links, results UI, share, trending all done and live-verified. Only deferred: item swap/per-bundle regenerate (P1, needs new engine capability — backlogged) |
 | 3. Analytics | 🔄 In Progress | 40% | Fixed real bugs: PostHog project is on EU cloud but key/host in Vercel were wrong region (401s) — corrected and redeployed; confirmed `config.js` resolves 200 in production. Could NOT get a definitive automated (Playwright) confirmation that `posthog.capture()` reaches the network in this dev/build setup despite extensive debugging (SDK inits fine, consent optedIn, direct HTTP capture works) — needs one manual check: visit perfectbundle.vercel.app, then check PostHog → Activity → Events a few minutes later. Dashboard/funnel/attribution insights (P0) still need manual PostHog UI setup — no personal API key available to automate. **Convex engagementCounters now wired** (`convex/engagement.ts` — clicks/saves/shares/views per bundle, fired from all touchpoints; powers the Popular tab independently of PostHog) |
-| — | Real product photos + direct links | 🔄 Phase 1 shipped | **Strategy pivoted (2026-07-18).** Etsy rejected the app outright; Amazon (PA-API needs an already-approved Associate w/ sales) and eBay (pending) likely to reject too — per-retailer approval is a dead end. New plan (spec `2026-07-18-product-data-and-images-design.md`): go through **Sovrn Commerce**, a free aggregator with day-one publisher approval whose Product API returns real photo + direct affiliate buy link + price + merchant across all major retailers — one integration, all three problems (photos, buyable links, revenue). **Phase 1 done:** representative stock images (free Pexels API, env-gated, cached at generation, labelled) give cards real photos now, and are the universal fallback for regions/products Sovrn can't match. **Phase 2 (Sovrn) blocked only on owner action:** free Sovrn Commerce signup → approved campaign → Product-API key. Amazon/eBay stay as pure upside if they ever approve |
+| — | Real product photos + direct links | ✅ Done (2026-07-19) | **Resolution of the 2026-07-18 strategy pivot.** Etsy's app was rejected and removed entirely from the codebase (link builder + tests). Amazon and **eBay were approved** the same evening, reopening the direct-retailer route — Sovrn (the aggregator fallback) is no longer needed as the primary path. Shipped: (1) representative stock images — **Unsplash primary + Pexels fallback**, env-gated, cached at generation, photographer-credited (Unsplash's terms require it); (2) **eBay Browse API wired as the real-product layer** — OAuth client-credentials token fetched once per generation, per-item search, real photo + direct buyable item link + real price via `chooseItemMedia`'s `realProduct` slot (generalized from the original Sovrn-specific `sovrn` param). **Verified live**: a real (uncached) generation returned genuine eBay photo+price+buy-link for every item across all 3 bundles. Also found and fixed a real pre-existing bug while flipping on Amazon's tag: `retailer-links.ts` read non-`NEXT_PUBLIC_` env vars from a client component, so the affiliate tag never reached the browser bundle — renamed to `NEXT_PUBLIC_AFFILIATE_TAG_AMAZON`/`NEXT_PUBLIC_AFFILIATE_ID_EBAY`, regression-tested. Sovrn env vars/docs remain in place, unused, as a documented future alternate source. |
 | 4. Accounts & Retention | 🔄 In Progress | 65% | Clerk auth, save-bundle + guest→signup upsell, and "My bundles" page all live in production. Recipient profiles done: `convex/recipientProfiles.ts` CRUD (auth-gated + ownership-checked), `/profiles` page (create/edit/delete), and a unit-tested prefill helper (`src/lib/quiz/prefill.ts`) for "New bundles for X". Past-bundle memory now live — `recipientProfiles.pastItemNames` feeds an "avoid repeating" prompt instruction, updated after each fresh (non-cached) generation; `profileId` threads through `QuizState` (kept out of `QuizAnswers`/cache hash), and the generation-cache key folds in `profileId` so a stale hit can't bypass dedup. **Popular tab live** — `/popular` ranks publicly-shared user-generated bundles by engagement score (`convex/engagement.ts` `listPopular` + pure `popularityScore`), distinct from editorial `/trending`, cross-linked, with a cold-start empty state. Quiz's hardcoded option lists extracted to `src/lib/quiz/options.ts`. Still using Clerk **dev-mode keys** in production (no prod instance yet). Still to build: occasion reminders (Resend cron), wire `signup` PostHog event |
 | 5. Testing & Polish | 🔄 In Progress | 80% | E2E suite: 41 passing across chromium/firefox/webkit/mobile-chrome (3 intentionally skipped off-chromium — quota control) + baseline a11y audit passing on all 4. Only Lighthouse performance scoring remains |
 | 6. Launch | ⏳ Not Started | 0% | |
@@ -41,6 +41,13 @@ See `docs/tasks.md` for the live task list. Summary:
 ---
 
 ## Completed Items ✅
+
+### This Session (2026-07-19)
+- [x] **Real eBay product data live** — owner got approved on eBay + Amazon (Etsy rejected, now fully removed from the codebase with a regression test). Wired eBay's Browse API as the primary real-product layer: OAuth2 client-credentials token (`getEbayToken`, one fetch per generation, not per item — `btoa`-based Basic auth since Convex's default runtime has no Node `Buffer`), per-item search (`fetchEbayProduct`), pure response parsing (`parseEbayItemSummary`, `ebayMarketplaceForCountry`, `formatEbayPrice` in `src/lib/engine/media.ts`, TDD'd). `chooseItemMedia`'s `sovrn` parameter generalized to `realProduct` since eBay — not Sovrn — is the live provider (Sovrn stays as a documented, unused alternate behind the same seam). **Verified live** with a real uncached generation: every item across all 3 bundles got a genuine eBay photo, direct buyable item URL, and real price.
+- [x] **Dual stock-image providers** — switched Phase 1 images from Pexels-only to **Unsplash primary + Pexels fallback** (more free-tier headroom), and added required photographer attribution ("Photo by X on Unsplash/Pexels") per Unsplash's API terms. Verified live: both providers actively serving real, correctly-credited images.
+- [x] **Found and fixed a real pre-existing bug**: Amazon/eBay affiliate tags never reached outbound links because `src/lib/links/retailer-links.ts` (called from the `"use client"` `BundleCard`) read plain `AFFILIATE_TAG_AMAZON`/`AFFILIATE_ID_EBAY` — Next.js only inlines `NEXT_PUBLIC_`-prefixed vars into the browser bundle, so the tag was always `undefined` client-side regardless of what was set in Vercel. Renamed both, added a regression test, documented the client/server env-var split (a separate server-only `AFFILIATE_ID_EBAY` now also feeds the eBay Browse API's affiliate header).
+- [x] Etsy fully removed from `src/lib/links/retailer-links.ts` (app rejected) — regression test asserts no Etsy link/URL can silently reappear.
+- Plan: `docs/superpowers/plans/2026-07-19-ebay-real-products-affiliate-fix.md`. Verified: Vitest 100/100, `tsc --noEmit` clean, `next build` clean, Playwright chromium 18/18.
 
 ### This Session (2026-07-18)
 - [x] Product-data strategy pivot + Phase 1 images: Etsy rejected the app (Amazon/eBay likely too), so instead of per-retailer approval we go through **Sovrn Commerce** — a free, day-one-approval aggregator whose Product API returns real photo + direct affiliate buy link + price + merchant across all major retailers. Brainstormed + spec'd (`docs/superpowers/specs/2026-07-18-product-data-and-images-design.md`). **Phase 1 shipped**: representative item images via free Pexels API (env-gated `PEXELS_API_KEY`, fetched+cached at generation, "Representative image" caption, best-effort/never-blocks), pure unit-tested `src/lib/engine/media.ts` with first-match-wins layering (Sovrn→stock→none) so Phase 2 is a drop-in. Plan: `docs/superpowers/plans/2026-07-18-phase1-representative-images.md`. Verified: Vitest 89/89, tsc/build clean, Playwright chromium 16/16 (new `bundle-images.spec`). Phase 2 pending owner's Sovrn key.
@@ -196,6 +203,14 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-18 | 3a1dd8c…96c28a5 | Phase 1 representative images: media fields, pure media module, env-gated Pexels enrichment, BundleCard image + caption |
 | 2026-07-18 | 3a1dd8c…01d7e2d | docs closeout — Phase 1 representative images complete |
 | 2026-07-18 | d92244d | Phase 2 UI: Buy-at-merchant affiliate button + disclosure (shape-independent; Sovrn parser still blocked on approved campaign) |
+| 2026-07-18 | f735f65 | docs: Phase 2 UI done; Pexels/Sovrn keys blocked (invalid key / unapproved campaign) |
+| 2026-07-19 | 413b5d1 | Etsy removed; Unsplash primary + Pexels fallback with photographer attribution |
+| 2026-07-19 | 7ad56bf | docs: eBay+Amazon approved, Etsy removed; Unsplash+Pexels image providers |
+| 2026-07-19 | f362aa3 | eBay real-products + affiliate-tag bug fix implementation plan |
+| 2026-07-19 | ddca52d | fix: Amazon/eBay affiliate tags need NEXT_PUBLIC_ prefix to reach the browser |
+| 2026-07-19 | 28723b1 | eBay parsing/marketplace/price logic; chooseItemMedia generalized to realProduct |
+| 2026-07-19 | 2e373b1 | eBay Browse API wired as the primary real-product layer (OAuth + per-item search) |
+| 2026-07-19 | pending | docs closeout — eBay real products + affiliate-tag fix complete |
 
 ---
 
