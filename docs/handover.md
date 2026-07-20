@@ -46,7 +46,7 @@ detailed docs are linked at the bottom for when you need more than this gives.
 1. Visit https://perfectbundle.vercel.app, then check PostHog → Activity → Events to confirm analytics is actually landing.
 2. Build the PostHog dashboard views manually per `docs/dashboard-spec.md` (~10 min, one-time).
 3. ~~Register the Clerk webhook for the `signup` event~~ — **done 2026-07-20.** Remaining: verify it actually fires — sign up a fresh test account on the live site, check PostHog → Activity → Events for a `signup` event, and check the Clerk Dashboard webhook's Message log for a `200`. If the log shows non-200s, double check `CLERK_WEBHOOK_SIGNING_SECRET` was set in Vercel (not just Clerk) and that the deployment was redeployed after setting it.
-4. Optional revenue boost: get an eBay Partner Network **campaign ID** and set it as `AFFILIATE_ID_EBAY` (Convex env) — eBay Browse API buy links work today without it, but won't earn commission until it's set. Also add `NEXT_PUBLIC_AFFILIATE_ID_EBAY` (same value) for the fallback search-link tag.
+4. ~~Get an eBay Partner Network campaign ID~~ — **done 2026-07-20.** Set as `AFFILIATE_ID_EBAY` on Convex prod and `NEXT_PUBLIC_AFFILIATE_ID_EBAY` on Vercel, redeployed both. eBay buy-link clicks now earn commission.
 5. Whenever ready: a Resend API key unblocks the occasion-reminders build below.
 
 ## 5. Immediate next steps (build, unblocked)

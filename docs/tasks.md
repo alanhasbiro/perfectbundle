@@ -128,8 +128,8 @@
 - [x] P1 Popular tab UI alongside Trending — `/popular` ranks publicly-shared user-generated bundles (distinct from editorial `/trending`); cross-linked both ways; graceful cold-start empty state (plan: docs/superpowers/plans/2026-07-18-m4-popular-tab.md)
 
 ### Monetization Prep
-- [ ] P1 Apply: eBay Partner Network, Awin (Etsy); Amazon Associates once traffic exists
-- [ ] P1 Flip affiliate tags via config when approved
+- [x] P1 Apply: eBay Partner Network (approved + campaign ID live 2026-07-20), Amazon Associates (approved, tag live). Awin (Etsy) moot — Etsy's app was rejected and Etsy removed from the codebase.
+- [x] P1 Flip affiliate tags via config when approved — Amazon done 2026-07-19; eBay campaign ID (`AFFILIATE_ID_EBAY` / `NEXT_PUBLIC_AFFILIATE_ID_EBAY`) set on Convex prod + Vercel 2026-07-20
 
 ### Product images & buyable links (spec: docs/superpowers/specs/2026-07-18-product-data-and-images-design.md)
 > **Updated 2026-07-18 (evening): eBay + Amazon APPROVED; Etsy rejected → removed entirely.** This reopens the direct-retailer route: eBay's Browse API can supply real product photos + direct links, and Amazon Associates tags can now be flipped on. Sovrn remains a useful aggregator fallback but is no longer the only path. Representative images (Unsplash primary, Pexels fallback) cover everything either way.
