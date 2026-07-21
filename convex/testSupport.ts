@@ -65,6 +65,26 @@ export const seedPublicBundle = mutation({
 export const seedPopularBundle = mutation({
   args: {},
   handler: async (ctx) => {
+    // Clean up any previous runs' fixture rows first. Every one of them
+    // scores identically via popularityScore(), and listPopular() caps at
+    // 20 results with a stable (insertion-order) tie-break — without this,
+    // repeated local dev/test runs accumulate enough tied entries that a
+    // freshly seeded bundle gets pushed off the visible list entirely.
+    const stale = await ctx.db
+      .query("bundles")
+      .withIndex("by_quizHash", (q) => q.eq("quizHash", "e2e-popular-fixture"))
+      .collect();
+    for (const bundle of stale) {
+      const counters = await ctx.db
+        .query("engagementCounters")
+        .withIndex("by_bundleId", (q) => q.eq("bundleId", bundle._id))
+        .collect();
+      for (const counter of counters) {
+        await ctx.db.delete("engagementCounters", counter._id);
+      }
+      await ctx.db.delete("bundles", bundle._id);
+    }
+
     const id = await ctx.db.insert("bundles", {
       createdAt: Date.now(),
       quizHash: "e2e-popular-fixture",

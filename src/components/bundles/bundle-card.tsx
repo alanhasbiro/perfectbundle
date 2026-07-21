@@ -60,7 +60,10 @@ export function BundleCard({
   };
 
   return (
-    <article className="flex flex-col gap-4 rounded-2xl border border-foreground/15 p-6">
+    <article
+      data-testid={bundleId ? `bundle-card-${bundleId}` : undefined}
+      className="flex flex-col gap-4 rounded-2xl border border-foreground/15 p-6"
+    >
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="text-xl font-semibold">{content.theme}</h3>

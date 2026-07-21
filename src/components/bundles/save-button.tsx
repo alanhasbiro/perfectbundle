@@ -38,12 +38,18 @@ function SavedToggle({ bundleId }: { bundleId: Id<"bundles"> }) {
   const record = useMutation(api.engagement.record);
 
   const handleClick = async () => {
-    if (saved) {
-      await remove({ bundleId });
-    } else {
-      await save({ bundleId });
-      track("bundle_saved", { bundle_id: bundleId });
-      void record({ bundleId, kind: "generated", type: "saves" });
+    try {
+      if (saved) {
+        await remove({ bundleId });
+      } else {
+        await save({ bundleId });
+        track("bundle_saved", { bundle_id: bundleId });
+        void record({ bundleId, kind: "generated", type: "saves" });
+      }
+    } catch {
+      // Best-effort: a rare auth-token race right after sign-in could reject
+      // this; the button simply stays in its current state for the user to
+      // retry rather than surfacing an error (no toast system in this app).
     }
   };
 
