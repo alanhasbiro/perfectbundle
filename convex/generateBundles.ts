@@ -336,3 +336,99 @@ export const generate = action({
     return { status: "ok", bundleIds, cacheHit: false };
   },
 });
+
+export const swapItem = action({
+  args: {
+    bundleId: v.id("bundles"),
+    itemIndex: v.number(),
+    rateLimitKey: v.string(),
+  },
+  handler: async (ctx, { bundleId, itemIndex, rateLimitKey }): Promise<SwapItemResult> => {
+    const allowed: boolean = await ctx.runMutation(internal.rateLimit.checkAndConsume, {
+      key: rateLimitKey,
+      max: RATE_LIMIT_MAX,
+      windowMs: RATE_LIMIT_WINDOW_MS,
+    });
+    if (!allowed) return { status: "rate_limited" };
+
+    const bundle = await ctx.runQuery(internal.bundles.getByIdInternal, { id: bundleId });
+    if (!bundle) return { status: "failed", reason: "Bundle not found" };
+    if (itemIndex < 0 || itemIndex >= bundle.items.length) {
+      return { status: "failed", reason: "Invalid item index" };
+    }
+
+    const itemToReplace = bundle.items[itemIndex];
+    const otherItemNames = bundle.items.filter((_, i) => i !== itemIndex).map((it) => it.name);
+    const prompt = buildItemSwapPrompt(
+      bundle.quiz as QuizAnswers,
+      bundle.theme,
+      otherItemNames,
+      itemToReplace.name
+    );
+
+    let raw = await callGemini(prompt, BUNDLE_ITEM_RESPONSE_SCHEMA);
+    let parsed = raw
+      ? parseItemResponse(raw)
+      : ({ ok: false, error: "No response from Gemini" } as const);
+    if (!parsed.ok) {
+      raw = await callGemini(prompt, BUNDLE_ITEM_RESPONSE_SCHEMA);
+      parsed = raw
+        ? parseItemResponse(raw)
+        : ({ ok: false, error: "No response from Gemini (retry)" } as const);
+    }
+    if (!parsed.ok) return { status: "failed", reason: parsed.error };
+
+    const ebayToken = await getEbayToken();
+    const enrichedItem = await enrichItemWithMedia(parsed.item, bundle.quiz.country, ebayToken);
+
+    const newItems = [...bundle.items];
+    newItems[itemIndex] = enrichedItem;
+    await ctx.runMutation(internal.bundles.patchItems, { id: bundleId, items: newItems });
+
+    return { status: "ok" };
+  },
+});
+
+export const regenerateBundle = action({
+  args: {
+    bundleId: v.id("bundles"),
+    rateLimitKey: v.string(),
+  },
+  handler: async (ctx, { bundleId, rateLimitKey }): Promise<RegenerateBundleResult> => {
+    const allowed: boolean = await ctx.runMutation(internal.rateLimit.checkAndConsume, {
+      key: rateLimitKey,
+      max: RATE_LIMIT_MAX,
+      windowMs: RATE_LIMIT_WINDOW_MS,
+    });
+    if (!allowed) return { status: "rate_limited" };
+
+    const bundle = await ctx.runQuery(internal.bundles.getByIdInternal, { id: bundleId });
+    if (!bundle) return { status: "failed", reason: "Bundle not found" };
+
+    const prompt = buildBundleRegeneratePrompt(bundle.quiz as QuizAnswers, bundle.theme);
+
+    let raw = await callGemini(prompt, BUNDLE_RESPONSE_SCHEMA);
+    let parsed = raw
+      ? parseSingleBundleResponse(raw)
+      : ({ ok: false, error: "No response from Gemini" } as const);
+    if (!parsed.ok) {
+      raw = await callGemini(prompt, BUNDLE_RESPONSE_SCHEMA);
+      parsed = raw
+        ? parseSingleBundleResponse(raw)
+        : ({ ok: false, error: "No response from Gemini (retry)" } as const);
+    }
+    if (!parsed.ok) return { status: "failed", reason: parsed.error };
+
+    const [enrichedBundle] = await enrichBundlesWithMedia([parsed.bundle], bundle.quiz.country);
+
+    await ctx.runMutation(internal.bundles.patchContent, {
+      id: bundleId,
+      theme: enrichedBundle.theme,
+      rationale: enrichedBundle.rationale,
+      estTotal: enrichedBundle.estTotal,
+      items: enrichedBundle.items,
+    });
+
+    return { status: "ok" };
+  },
+});
