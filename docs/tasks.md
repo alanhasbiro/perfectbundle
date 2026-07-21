@@ -64,10 +64,10 @@
 
 ### Bundle Results UI (F2/F4) — ✅ mostly complete 2026-07-17 (plan: docs/superpowers/plans/2026-07-17-m2-results-share-trending.md)
 - [x] P0 3-bundle results page: theme, items, "why this fits", est. totals vs budget — `src/app/quiz/results/page.tsx` + `<BundleCard>`
-- [!] P1 Item swap ("show me another") — single-slot engine call — moved to Backlog (see below); needs new engine capability, deferred from this sprint
-- [x] P0 Whole-bundle regenerate — covered via "Start over" (re-runs the quiz); true per-card regenerate deferred with item swap
+- [x] P1 Item swap ("show me another") — done 2026-07-20, see Backlog section
+- [x] P0 Whole-bundle regenerate — "Start over" (re-runs the quiz) plus true per-card regenerate, done 2026-07-20 (see Backlog section)
 - [x] P0 Loading/error/retry states (never dead-ends) — "Building your bundles…" loading state; failure/rate-limit falls back to curated trending bundles inline, verified live by disabling the Gemini key
-- [x] P0 Events: item_swapped, bundle_regenerated — event names reserved in `AnalyticsEvent` union; not fired yet since the features themselves are deferred (see Backlog)
+- [x] P0 Events: item_swapped, bundle_regenerated — now firing live, see Backlog section (2026-07-20)
 
 ### Share (F5) — ✅ complete 2026-07-17
 - [x] P0 Persist bundle → public `/b/<id>` page (no auth required) — `convex/bundles.ts` `makePublic`/`getPublic` + `src/app/b/[id]/page.tsx` (Server Component, `fetchQuery`)
@@ -180,8 +180,8 @@
 ---
 
 ## Backlog (Future Phases)
-- [ ] P1 Single-item swap ("show me another") — needs engine support for regenerating one bundle slot (new prompt variant scoped to a single item + existing bundle context); deferred from M2 results UI sprint
-- [ ] P1 Per-bundle regenerate (distinct from whole-quiz "Start over") — same engine dependency as item swap
+- [x] P1 Single-item swap ("show me another") — `buildItemSwapPrompt`/`parseItemResponse` (`src/lib/engine/`), `generateBundles:swapItem` Convex action, `BundleCard` "🔄 Show me another" per-item button. Fires `item_swapped`. Plan: `docs/superpowers/plans/2026-07-20-item-swap-bundle-regenerate.md`
+- [x] P1 Per-bundle regenerate (distinct from whole-quiz "Start over") — `buildBundleRegeneratePrompt`/`parseSingleBundleResponse`, `generateBundles:regenerateBundle` Convex action, `BundleCard` "🔄 Regenerate" per-bundle button. Fires `bundle_regenerated`. Same plan as above.
 - [ ] P2 `<BundleCard>` shows curated bundles' `theme` (descriptive tagline) as its heading, not the catchier admin-facing `title` field (e.g. "Slow coffee mornings" instead of "The Coffee Ritual") — found via E2E test writing; minor polish, not a functional bug (generated bundles have no separate title field, so this is consistent behavior, just not the punchiest copy for curated/trending)
 - [ ] P2 eBay Browse API: live prices/deals where available
 - [ ] P2 Engine learning from click data (boost item types that get clicks)
