@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "convex/react";
+import { useMutation, useAction } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import type { Id } from "../../../convex/_generated/dataModel";
 import { buildRetailerLinks } from "@/lib/links/retailer-links";
 import { classifyBudgetStatus } from "@/lib/bundles/budget-status";
 import { track } from "@/lib/analytics";
+import { getOrCreateSessionId } from "@/lib/session-id";
 import { SaveButton } from "./save-button";
 import type { BundleContentLike, BundleItemLike } from "./bundle-card-types";
 
@@ -34,7 +35,11 @@ export function BundleCard({
 }) {
   const makePublic = useMutation(api.bundles.makePublic);
   const record = useMutation(api.engagement.record);
+  const swapItem = useAction(api.generateBundles.swapItem);
+  const regenerateBundle = useAction(api.generateBundles.regenerateBundle);
   const [shareState, setShareState] = useState<"idle" | "sharing" | "copied">("idle");
+  const [swappingIndex, setSwappingIndex] = useState<number | null>(null);
+  const [regenerating, setRegenerating] = useState(false);
 
   const status = budget !== undefined ? classifyBudgetStatus(content.estTotal, budget) : "unknown";
   const budgetLabel = BUDGET_LABEL[status];
@@ -59,6 +64,42 @@ export function BundleCard({
     setTimeout(() => setShareState("idle"), 2000);
   };
 
+  const handleRegenerate = async () => {
+    if (!bundleId || regenerating) return;
+    setRegenerating(true);
+    try {
+      const result = await regenerateBundle({
+        bundleId,
+        rateLimitKey: getOrCreateSessionId(),
+      });
+      if (result.status === "ok") {
+        track("bundle_regenerated", { bundle_id: bundleId });
+      }
+      // On "rate_limited" or "failed", silently no-op — the button just
+      // re-enables below for the user to try again.
+    } finally {
+      setRegenerating(false);
+    }
+  };
+
+  const handleSwapItem = async (id: Id<"bundles">, itemIndex: number, itemName: string) => {
+    if (swappingIndex !== null) return;
+    setSwappingIndex(itemIndex);
+    try {
+      const result = await swapItem({
+        bundleId: id,
+        itemIndex,
+        rateLimitKey: getOrCreateSessionId(),
+      });
+      if (result.status === "ok") {
+        track("item_swapped", { bundle_id: id, item_name: itemName });
+      }
+      // On "rate_limited" or "failed", silently no-op — the button re-enables.
+    } finally {
+      setSwappingIndex(null);
+    }
+  };
+
   return (
     <article
       data-testid={bundleId ? `bundle-card-${bundleId}` : undefined}
@@ -80,6 +121,14 @@ export function BundleCard({
             >
               {shareState === "copied" ? "Link copied!" : "Share"}
             </button>
+            <button
+              type="button"
+              onClick={handleRegenerate}
+              disabled={regenerating}
+              className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs transition hover:border-foreground/50 disabled:opacity-50"
+            >
+              {regenerating ? "Regenerating…" : "🔄 Regenerate"}
+            </button>
           </div>
         ) : null}
       </div>
@@ -90,7 +139,7 @@ export function BundleCard({
       </div>
 
       <ul className="flex flex-col gap-4">
-        {content.items.map((item) => {
+        {content.items.map((item, itemIndex) => {
           const links = buildRetailerLinks(item.searchQuery, country, urgency);
           return (
             <li key={item.name} className="rounded-xl border border-foreground/10 p-4">
@@ -169,6 +218,16 @@ export function BundleCard({
                     {item.productUrl ? `Or ${link.label}` : link.label}
                   </a>
                 ))}
+                {bundleId ? (
+                  <button
+                    type="button"
+                    onClick={() => handleSwapItem(bundleId, itemIndex, item.name)}
+                    disabled={swappingIndex === itemIndex}
+                    className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs opacity-70 transition hover:border-foreground/50 hover:opacity-100 disabled:opacity-40"
+                  >
+                    {swappingIndex === itemIndex ? "Swapping…" : "🔄 Show me another"}
+                  </button>
+                ) : null}
               </div>
             </li>
           );

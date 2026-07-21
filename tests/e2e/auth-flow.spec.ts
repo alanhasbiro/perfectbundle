@@ -98,6 +98,15 @@ test.describe("authenticated flow: signup, save, profile", () => {
 
       await expect(page.getByRole("heading", { name: "E2E Test Person" })).toBeVisible();
       await expect(page.getByText("Friend · 25-34")).toBeVisible();
+
+      // --- Regenerate the bundle we just saved (one real Gemini call) ---
+      await page.goto("/my-bundles");
+      await expect(page.getByText("E2E Popular Bundle")).toBeVisible();
+      const regenerateButton = page.getByRole("button", { name: /Regenerate/ });
+      await regenerateButton.click();
+      await expect(page.getByRole("button", { name: "Regenerating…" })).toBeVisible();
+      // Real Gemini call — allow up to 20s, matching quiz-flow.spec.ts's generation timeout.
+      await expect(page.getByText("E2E Popular Bundle")).not.toBeVisible({ timeout: 20_000 });
     } finally {
       await clerkClient.users.deleteUser(user.id);
     }
