@@ -152,7 +152,7 @@
 
 - [x] P0 Playwright E2E: quiz → bundles → link click — `tests/e2e/quiz-flow.spec.ts` (docs/superpowers/plans/2026-07-17-m5-playwright-e2e.md), 8/8 passing
 - [x] P0 Playwright E2E: share flow (create + open public link) — `tests/e2e/share.spec.ts` (seeds via test-only Convex mutation, not a live click-through, to stay fast/deterministic/quota-free)
-- [ ] P1 Playwright E2E: signup → save → profile → regenerate — blocked on M4 (no auth/save/profiles exist yet)
+- [x] P1 Playwright E2E: signup → save → profile — `tests/e2e/auth-flow.spec.ts`, uses `@clerk/testing`'s `clerk.signIn()` against a throwaway Clerk user created via the Backend API (not a real sign-up-form click-through — that's Clerk's own tested surface), bundle seeded via `testSupport:seedPopularBundle` to spend zero extra Gemini quota. `regenerate` isn't covered yet — that's per-bundle regenerate, a separate not-yet-built feature (see Backlog); extend this test once it exists.
 - [x] P0 Golden-fixture engine suite in CI — `src/lib/engine/golden-fixtures.test.ts` (added M2), runs via `npm test` in GitHub Actions CI
 - [x] P0 Cross-browser + mobile viewport pass — chromium, firefox, webkit, mobile-chrome (Pixel 7) all covered via `tests/e2e/` (docs/superpowers/plans/2026-07-17-m5-cross-browser-a11y.md); the one Gemini-calling test intentionally runs on chromium only (quota-conscious, `test.skip` on other projects) — 41 passed, 3 skipped
 - [ ] P1 Lighthouse ≥90 (performance, a11y) on quiz + results — still not run; separate tooling/CI setup, deferred
