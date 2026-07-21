@@ -1,5 +1,17 @@
 import { defineConfig, devices } from "@playwright/test";
 
+// Next.js and Convex's dev servers (spawned below via webServer) each load
+// .env.local themselves automatically. The Playwright config/test-runner
+// process does not — load it explicitly so clerkSetup() and the auth test's
+// direct Backend API calls can read CLERK_SECRET_KEY /
+// NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY.
+try {
+  process.loadEnvFile(".env.local");
+} catch {
+  // .env.local not present (e.g. CI) — Clerk-dependent tests will fail to
+  // authenticate, but the rest of the suite is unaffected.
+}
+
 export default defineConfig({
   testDir: "./tests/e2e",
   timeout: 60_000,
@@ -18,8 +30,13 @@ export default defineConfig({
   },
   projects: [
     {
+      name: "setup",
+      testMatch: /clerk\.setup\.ts/,
+    },
+    {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
+      dependencies: ["setup"],
     },
     {
       name: "firefox",
