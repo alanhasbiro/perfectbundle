@@ -2,8 +2,8 @@ import { v } from "convex/values";
 import { action } from "./_generated/server";
 import { internal } from "./_generated/api";
 import type { Id } from "./_generated/dataModel";
-import { buildBundlePrompt } from "../src/lib/engine/prompt";
-import { parseBundleResponse } from "../src/lib/engine/parse-response";
+import { buildBundlePrompt, buildItemSwapPrompt, buildBundleRegeneratePrompt } from "../src/lib/engine/prompt";
+import { parseBundleResponse, parseItemResponse, parseSingleBundleResponse } from "../src/lib/engine/parse-response";
 import {
   buildStockImageQuery,
   parseUnsplashResponse,
@@ -14,7 +14,7 @@ import {
   type StockImage,
   type ProductMedia,
 } from "../src/lib/engine/media";
-import type { BundleContent } from "../src/lib/engine/schemas";
+import type { BundleContent, BundleItem } from "../src/lib/engine/schemas";
 import { hashQuizAnswers } from "../src/lib/quiz/hash";
 import type { QuizAnswers } from "../src/lib/quiz/types";
 
@@ -48,9 +48,48 @@ export type GenerateResult =
   | { status: "rate_limited" }
   | { status: "failed"; reason: string };
 
+export type SwapItemResult =
+  | { status: "ok" }
+  | { status: "rate_limited" }
+  | { status: "failed"; reason: string };
+
+export type RegenerateBundleResult =
+  | { status: "ok" }
+  | { status: "rate_limited" }
+  | { status: "failed"; reason: string };
+
+const BUNDLE_ITEM_RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    name: { type: "STRING" },
+    description: { type: "STRING" },
+    why: { type: "STRING" },
+    estPriceRange: { type: "STRING" },
+    searchQuery: { type: "STRING" },
+    tags: { type: "ARRAY", items: { type: "STRING" } },
+  },
+  required: ["name", "description", "why", "estPriceRange", "searchQuery", "tags"],
+};
+
+const BUNDLE_RESPONSE_SCHEMA = {
+  type: "OBJECT",
+  properties: {
+    theme: { type: "STRING" },
+    rationale: { type: "STRING" },
+    estTotal: { type: "STRING" },
+    items: { type: "ARRAY", items: BUNDLE_ITEM_RESPONSE_SCHEMA },
+  },
+  required: ["theme", "rationale", "estTotal", "items"],
+};
+
+const THREE_BUNDLES_RESPONSE_SCHEMA = {
+  type: "ARRAY",
+  items: BUNDLE_RESPONSE_SCHEMA,
+};
+
 // fetch() is available in Convex's default runtime — no "use node" needed here,
 // and this file must not export queries/mutations alongside a node runtime anyway.
-async function callGemini(prompt: string): Promise<string | null> {
+async function callGemini(prompt: string, responseSchema: object): Promise<string | null> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) return null;
 
@@ -59,33 +98,7 @@ async function callGemini(prompt: string): Promise<string | null> {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
       responseMimeType: "application/json",
-      responseSchema: {
-        type: "ARRAY",
-        items: {
-          type: "OBJECT",
-          properties: {
-            theme: { type: "STRING" },
-            rationale: { type: "STRING" },
-            estTotal: { type: "STRING" },
-            items: {
-              type: "ARRAY",
-              items: {
-                type: "OBJECT",
-                properties: {
-                  name: { type: "STRING" },
-                  description: { type: "STRING" },
-                  why: { type: "STRING" },
-                  estPriceRange: { type: "STRING" },
-                  searchQuery: { type: "STRING" },
-                  tags: { type: "ARRAY", items: { type: "STRING" } },
-                },
-                required: ["name", "description", "why", "estPriceRange", "searchQuery", "tags"],
-              },
-            },
-          },
-          required: ["theme", "rationale", "estTotal", "items"],
-        },
-      },
+      responseSchema,
     },
   };
 
@@ -193,10 +206,24 @@ async function fetchEbayProduct(
   }
 }
 
-// Attaches best-effort media to every item of every bundle: a real eBay
-// product (photo + direct link + price) when available, else a representative
-// stock image. Any per-provider failure yields no media for that item; the
-// overall generation is never blocked.
+// Attaches best-effort media to a single item: a real eBay product (photo +
+// direct link + price) when available, else a representative stock image, else
+// nothing. Never throws — media is best-effort and must never block generation.
+async function enrichItemWithMedia(
+  item: BundleItem,
+  country: string,
+  ebayToken: string | null
+): Promise<BundleItem> {
+  const realProduct = ebayToken
+    ? await fetchEbayProduct(buildStockImageQuery(item), country, ebayToken)
+    : null;
+  const stock = await fetchStockImage(buildStockImageQuery(item));
+  const media = chooseItemMedia({ realProduct, stock });
+  return { ...item, ...media };
+}
+
+// Attaches best-effort media to every item of every bundle — see
+// enrichItemWithMedia for the per-item logic.
 async function enrichBundlesWithMedia(
   bundles: BundleContent[],
   country: string
@@ -206,14 +233,7 @@ async function enrichBundlesWithMedia(
     bundles.map(async (bundle) => ({
       ...bundle,
       items: await Promise.all(
-        bundle.items.map(async (item) => {
-          const realProduct = ebayToken
-            ? await fetchEbayProduct(buildStockImageQuery(item), country, ebayToken)
-            : null;
-          const stock = await fetchStockImage(buildStockImageQuery(item));
-          const media = chooseItemMedia({ realProduct, stock });
-          return { ...item, ...media };
-        })
+        bundle.items.map((item) => enrichItemWithMedia(item, country, ebayToken))
       ),
     }))
   );
@@ -274,14 +294,14 @@ export const generate = action({
 
     const prompt = buildBundlePrompt(quiz, pastItemNames);
 
-    let raw = await callGemini(prompt);
+    let raw = await callGemini(prompt, THREE_BUNDLES_RESPONSE_SCHEMA);
     let parsed = raw
       ? parseBundleResponse(raw)
       : ({ ok: false, error: "No response from Gemini" } as const);
 
     if (!parsed.ok) {
       // One retry on invalid/unparseable JSON, per docs/prd.md F2.
-      raw = await callGemini(prompt);
+      raw = await callGemini(prompt, THREE_BUNDLES_RESPONSE_SCHEMA);
       parsed = raw
         ? parseBundleResponse(raw)
         : ({ ok: false, error: "No response from Gemini (retry)" } as const);

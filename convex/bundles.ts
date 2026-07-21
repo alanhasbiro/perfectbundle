@@ -1,5 +1,5 @@
 import { v } from "convex/values";
-import { internalMutation, mutation, query } from "./_generated/server";
+import { internalMutation, internalQuery, mutation, query } from "./_generated/server";
 import type { Id } from "./_generated/dataModel";
 
 const bundleItemValidator = v.object({
@@ -63,6 +63,40 @@ export const storeGenerated = internalMutation({
       ids.push(id);
     }
     return ids;
+  },
+});
+
+// Server-side-only bundle lookup — used by the swap/regenerate actions in
+// generateBundles.ts, which need to read a bundle's current content before
+// asking Gemini for a replacement.
+export const getByIdInternal = internalQuery({
+  args: { id: v.id("bundles") },
+  handler: async (ctx, { id }) => ctx.db.get("bundles", id),
+});
+
+// Replaces just the items array (used by item-swap — the theme/rationale/
+// estTotal stay the same, only one item changes).
+export const patchItems = internalMutation({
+  args: { id: v.id("bundles"), items: v.array(bundleItemValidator) },
+  handler: async (ctx, { id, items }) => {
+    await ctx.db.patch("bundles", id, { items });
+    return null;
+  },
+});
+
+// Replaces the whole bundle's content in place, keeping the same _id (used by
+// per-bundle regenerate — the slot stays the same, its content is refreshed).
+export const patchContent = internalMutation({
+  args: {
+    id: v.id("bundles"),
+    theme: v.string(),
+    rationale: v.string(),
+    estTotal: v.string(),
+    items: v.array(bundleItemValidator),
+  },
+  handler: async (ctx, { id, theme, rationale, estTotal, items }) => {
+    await ctx.db.patch("bundles", id, { theme, rationale, estTotal, items });
+    return null;
   },
 });
 
