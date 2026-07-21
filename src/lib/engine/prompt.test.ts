@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildBundlePrompt } from "./prompt";
+import { buildBundlePrompt, buildItemSwapPrompt, buildBundleRegeneratePrompt } from "./prompt";
 import type { QuizAnswers } from "../quiz/types";
 
 const answers: QuizAnswers = {
@@ -94,5 +94,70 @@ describe("buildBundlePrompt", () => {
     expect(p).toContain("Ceramic mug");
     expect(p).toContain("French press");
     expect(p).toMatch(/avoid repeating|do not repeat/i);
+  });
+});
+
+describe("buildItemSwapPrompt", () => {
+  it("includes the recipient context, bundle theme, and item to replace", () => {
+    const p = buildItemSwapPrompt(answers, "Cozy Coffee Morning", ["Ceramic Mug"], "French Press");
+    expect(p).toContain("Birthday");
+    expect(p).toContain("Cozy Coffee Morning");
+    expect(p).toContain("French Press");
+    expect(p).toContain("candles"); // exclusions still apply
+    expect(p).toContain("50"); // budget still applies
+  });
+
+  it("lists the other items so the replacement doesn't duplicate them", () => {
+    const p = buildItemSwapPrompt(answers, "Cozy Coffee Morning", ["Ceramic Mug", "Coffee Beans"], "French Press");
+    expect(p).toContain("Ceramic Mug");
+    expect(p).toContain("Coffee Beans");
+  });
+
+  it("asks for exactly one replacement item, not a full bundle", () => {
+    const p = buildItemSwapPrompt(answers, "Cozy Coffee Morning", [], "French Press");
+    expect(p).toMatch(/one|single/i);
+    expect(p).not.toMatch(/exactly 3/i);
+  });
+
+  it("mentions the required JSON field names for a single item object", () => {
+    const p = buildItemSwapPrompt(answers, "Cozy Coffee Morning", [], "French Press");
+    for (const field of ["name", "description", "why", "estPriceRange", "searchQuery", "tags"]) {
+      expect(p).toContain(field);
+    }
+  });
+
+  it("instructs avoiding past items when provided", () => {
+    const p = buildItemSwapPrompt(answers, "Cozy Coffee Morning", [], "French Press", ["Old Mug"]);
+    expect(p).toContain("Old Mug");
+    expect(p).toMatch(/avoid|previously/i);
+  });
+});
+
+describe("buildBundleRegeneratePrompt", () => {
+  it("includes the recipient context and the current theme to differ from", () => {
+    const p = buildBundleRegeneratePrompt(answers, "Cozy Coffee Morning");
+    expect(p).toContain("Birthday");
+    expect(p).toContain("Cozy Coffee Morning");
+    expect(p).toContain("candles");
+    expect(p).toContain("50");
+  });
+
+  it("asks for exactly one bundle, not three", () => {
+    const p = buildBundleRegeneratePrompt(answers, "Cozy Coffee Morning");
+    expect(p).toMatch(/one|single/i);
+    expect(p).not.toMatch(/exactly 3/i);
+  });
+
+  it("mentions the required JSON field names for a single bundle object", () => {
+    const p = buildBundleRegeneratePrompt(answers, "Cozy Coffee Morning");
+    for (const field of ["theme", "rationale", "estTotal", "items", "name", "description", "why", "estPriceRange", "searchQuery", "tags"]) {
+      expect(p).toContain(field);
+    }
+  });
+
+  it("instructs avoiding past items when provided", () => {
+    const p = buildBundleRegeneratePrompt(answers, "Cozy Coffee Morning", ["Old Mug"]);
+    expect(p).toContain("Old Mug");
+    expect(p).toMatch(/avoid|previously/i);
   });
 });

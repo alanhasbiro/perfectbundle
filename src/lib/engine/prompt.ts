@@ -72,3 +72,116 @@ export function buildBundlePrompt(answers: QuizAnswers, pastItemNames: string[] 
   );
   return lines.join("\n");
 }
+
+export function buildItemSwapPrompt(
+  answers: QuizAnswers,
+  bundleTheme: string,
+  otherItemNames: string[],
+  itemToReplaceName: string,
+  pastItemNames: string[] = []
+): string {
+  const lines: string[] = [];
+  lines.push(
+    "You are a thoughtful professional gift consultant. A recipient's gift bundle needs ONE item replaced with a better-fitting alternative."
+  );
+  lines.push("");
+  lines.push("RECIPIENT:");
+  lines.push(`- Occasion: ${answers.occasion}`);
+  lines.push(`- Age band: ${answers.ageBand}`);
+  if (answers.gender) lines.push(`- Gender: ${answers.gender}`);
+  lines.push(`- Relationship to gift-giver: ${answers.relationship}`);
+  lines.push(`- Interests: ${answers.interests.join(", ") || "none specified"}`);
+  if (answers.freeText) lines.push(`- Additional notes from the gift-giver: ${answers.freeText}`);
+  lines.push(`- Total bundle budget: ${answers.budget} ${answers.currency}`);
+  lines.push(
+    `- Exclusions (NEVER include these, or close synonyms of them): ${
+      answers.exclusions.length ? answers.exclusions.join(", ") : "none"
+    }`
+  );
+  lines.push("");
+  lines.push(`BUNDLE THEME: ${bundleTheme}`);
+  lines.push(`ITEM BEING REPLACED: ${itemToReplaceName}`);
+  if (otherItemNames.length) {
+    lines.push(
+      `OTHER ITEMS ALREADY IN THIS BUNDLE (do not duplicate or closely repeat these): ${otherItemNames.join(", ")}`
+    );
+  }
+  if (pastItemNames.length) {
+    lines.push(
+      `PREVIOUSLY SUGGESTED ITEMS FOR THIS RECIPIENT (avoid repeating these or close variants): ${pastItemNames.join(", ")}`
+    );
+  }
+  lines.push("");
+  lines.push("RULES:");
+  lines.push("1. Suggest exactly one single replacement item that fits the bundle theme better than the item being replaced.");
+  lines.push("2. Respect the total budget and never suggest an excluded item or close synonym of one.");
+  lines.push('3. Price is always an ESTIMATE range (e.g. "$15-25"), never a specific live price.');
+  lines.push("4. Apply age-appropriate safety rules, same as any gift suggestion.");
+  lines.push("5. Do not repeat the item being replaced, the other items already in the bundle, or any previously suggested item listed above.");
+  lines.push("");
+  lines.push("OUTPUT FORMAT:");
+  lines.push(
+    'Return JSON only, a single object (not an array) with fields: "name" (string), ' +
+      '"description" (string, 1 sentence), "why" (string, why this item fits), ' +
+      '"estPriceRange" (string like "$15-25"), "searchQuery" (string, a good product-search phrase for a retailer search box), ' +
+      '"tags" (array of 1-4 short lowercase strings).'
+  );
+  return lines.join("\n");
+}
+
+export function buildBundleRegeneratePrompt(
+  answers: QuizAnswers,
+  currentTheme: string,
+  pastItemNames: string[] = []
+): string {
+  const lines: string[] = [];
+  lines.push(
+    "You are a thoughtful professional gift consultant. Design ONE alternative gift bundle for the following recipient, different from a bundle they've already seen."
+  );
+  lines.push("");
+  lines.push("RECIPIENT:");
+  lines.push(`- Occasion: ${answers.occasion}`);
+  lines.push(`- Age band: ${answers.ageBand}`);
+  if (answers.gender) lines.push(`- Gender: ${answers.gender}`);
+  lines.push(`- Relationship to gift-giver: ${answers.relationship}`);
+  lines.push(`- Interests: ${answers.interests.join(", ") || "none specified"}`);
+  if (answers.freeText) lines.push(`- Additional notes from the gift-giver: ${answers.freeText}`);
+  lines.push(`- Total bundle budget: ${answers.budget} ${answers.currency}`);
+  lines.push(`- Delivery urgency: ${URGENCY_COPY[answers.urgency]}`);
+  lines.push(
+    `- Exclusions (NEVER include these, or close synonyms of them): ${
+      answers.exclusions.length ? answers.exclusions.join(", ") : "none"
+    }`
+  );
+  if (pastItemNames.length) {
+    lines.push(
+      `- Previously suggested items for this recipient (avoid repeating these or close variants): ${pastItemNames.join(", ")}`
+    );
+  }
+  lines.push("");
+  lines.push(`ALREADY-SEEN BUNDLE THEME (produce something meaningfully different from this): ${currentTheme}`);
+  lines.push("");
+  lines.push("RULES:");
+  lines.push("1. Produce exactly one single gift bundle, built around one clear, coherent theme distinct from the already-seen theme above.");
+  lines.push("2. The bundle must contain between 3 and 6 items that genuinely complement each other under that theme.");
+  lines.push("3. Respect the total budget: the sum of the item price ranges must stay close to it (within about 20%), never wildly over.");
+  lines.push("4. NEVER suggest an excluded item, or a close synonym/variant of one, in the bundle.");
+  lines.push('5. Prices are always an ESTIMATE range (e.g. "$15-25"), never a specific live price or a claim of current availability.');
+  lines.push("6. Apply age-appropriate safety rules: never suggest alcohol, tobacco, or age-restricted items unless the age band is clearly a legal adult for that item in a typical country, and prefer to avoid alcohol entirely unless interests explicitly mention it.");
+  lines.push("7. Avoid generic, cliché gifts unless they genuinely fit the interests given.");
+  if (pastItemNames.length) {
+    lines.push("8. Do not repeat any item from the 'previously suggested items' list above, or a near-identical variant of one.");
+  }
+  lines.push("");
+  lines.push("OUTPUT FORMAT:");
+  lines.push(
+    "Return JSON only, a single object (not an array) with fields: " +
+      '"theme" (string), "rationale" (string, 1-2 sentences on why this bundle fits), ' +
+      '"estTotal" (string price range like "$45-60"), and "items" (array of 3 to 6 objects). ' +
+      'Each item object has fields: "name" (string), "description" (string, 1 sentence), ' +
+      '"why" (string, why this item fits the recipient), "estPriceRange" (string like "$15-25"), ' +
+      '"searchQuery" (string, a good product-search phrase for a retailer search box), ' +
+      '"tags" (array of 1-4 short lowercase strings).'
+  );
+  return lines.join("\n");
+}

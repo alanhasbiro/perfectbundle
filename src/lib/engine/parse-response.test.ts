@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { parseBundleResponse } from "./parse-response";
+import { parseBundleResponse, parseItemResponse, parseSingleBundleResponse } from "./parse-response";
 
 const validItem = {
   name: "Ceramic pour-over set",
@@ -66,5 +66,46 @@ describe("parseBundleResponse", () => {
   it("fails when the top-level value is not an array", () => {
     const result = parseBundleResponse(JSON.stringify(validBundle));
     expect(result.ok).toBe(false);
+  });
+});
+
+describe("parseItemResponse", () => {
+  it("accepts a well-formed single item object", () => {
+    const result = parseItemResponse(JSON.stringify(validItem));
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.item.name).toBe("Ceramic pour-over set");
+  });
+
+  it("rejects a response missing a required field", () => {
+    const raw = JSON.stringify({ name: "French Press", description: "A press." });
+    expect(parseItemResponse(raw).ok).toBe(false);
+  });
+
+  it("rejects a response that's an array instead of a single object", () => {
+    const raw = JSON.stringify([validItem]);
+    expect(parseItemResponse(raw).ok).toBe(false);
+  });
+
+  it("strips code fences like the bundle parser does", () => {
+    const raw = "```json\n" + JSON.stringify(validItem) + "\n```";
+    expect(parseItemResponse(raw).ok).toBe(true);
+  });
+});
+
+describe("parseSingleBundleResponse", () => {
+  it("accepts a well-formed single bundle object", () => {
+    const result = parseSingleBundleResponse(JSON.stringify(validBundle));
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.bundle.theme).toBe("The Coffee Ritual");
+  });
+
+  it("rejects a response that's an array instead of a single object", () => {
+    const raw = JSON.stringify([validBundle]);
+    expect(parseSingleBundleResponse(raw).ok).toBe(false);
+  });
+
+  it("rejects a bundle with only 2 items (below the 3-6 range)", () => {
+    const tooFew = { ...validBundle, items: [validItem, validItem] };
+    expect(parseSingleBundleResponse(JSON.stringify(tooFew)).ok).toBe(false);
   });
 });

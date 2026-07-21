@@ -1,6 +1,6 @@
 // NOTE: keep this file free of React/Next imports — reused by mobile later.
 import { z } from "zod";
-import { bundleContentSchema, type BundleContent } from "./schemas";
+import { bundleContentSchema, bundleItemSchema, type BundleContent, type BundleItem } from "./schemas";
 
 export type ParseResult = { ok: true; bundles: BundleContent[] } | { ok: false; error: string };
 
@@ -28,4 +28,44 @@ export function parseBundleResponse(raw: string): ParseResult {
   }
 
   return { ok: true, bundles: parsed.data };
+}
+
+export type ParseItemResult = { ok: true; item: BundleItem } | { ok: false; error: string };
+
+export function parseItemResponse(raw: string): ParseItemResult {
+  const cleaned = stripCodeFences(raw);
+
+  let json: unknown;
+  try {
+    json = JSON.parse(cleaned);
+  } catch {
+    return { ok: false, error: "Response was not valid JSON" };
+  }
+
+  const parsed = bundleItemSchema.safeParse(json);
+  if (!parsed.success) {
+    return { ok: false, error: `Response did not match expected shape: ${parsed.error.message}` };
+  }
+
+  return { ok: true, item: parsed.data };
+}
+
+export type ParseSingleBundleResult = { ok: true; bundle: BundleContent } | { ok: false; error: string };
+
+export function parseSingleBundleResponse(raw: string): ParseSingleBundleResult {
+  const cleaned = stripCodeFences(raw);
+
+  let json: unknown;
+  try {
+    json = JSON.parse(cleaned);
+  } catch {
+    return { ok: false, error: "Response was not valid JSON" };
+  }
+
+  const parsed = bundleContentSchema.safeParse(json);
+  if (!parsed.success) {
+    return { ok: false, error: `Response did not match expected shape: ${parsed.error.message}` };
+  }
+
+  return { ok: true, bundle: parsed.data };
 }
