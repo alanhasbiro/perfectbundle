@@ -168,7 +168,7 @@
 **Timeline:** Week 8
 **Definition of Done:** Public URL, indexed, monitored; launch posts out.
 
-- [ ] P0 Production env vars audit (no secrets client-side) — spot-checked during M2/M5 (GEMINI_API_KEY only ever read server-side in Convex actions, never NEXT_PUBLIC_*); full audit still pending before launch
+- [x] P0 Production env vars audit (no secrets client-side) — done 2026-07-20. `grep`'d every `process.env.*` read in `src/` (client-reachable code): all are `NEXT_PUBLIC_`-prefixed, and everything under that prefix in `.env.local` is a genuinely public value (Convex URL, PostHog project key/host, Clerk publishable key, affiliate tags) — no real secret is mistakenly public. Cross-checked `npx convex env list --prod --names-only` against every server-only env read in `convex/*.ts`: exact match, nothing missing or unexpected. `next.config.ts` has no `env:` block that could leak a server var into the client bundle.
 - [ ] P1 Custom domain (only cost allowed: ~$10/yr domain — optional, can launch on vercel.app for $0)
 - [x] P0 SEO basics: meta, sitemap, robots; OG images — `src/app/robots.ts`, `src/app/sitemap.ts`, root layout OG metadata + `metadataBase`; share pages already had per-bundle OG tags from M2. (Note: sitemap/OG hardcode `perfectbundle.vercel.app` — update if a custom domain is added later.)
 - [ ] P0 Uptime monitoring (UptimeRobot free) — needs owner's UptimeRobot account
