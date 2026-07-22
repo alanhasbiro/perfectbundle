@@ -71,7 +71,7 @@
 
 ### Share (F5) — ✅ complete 2026-07-17
 - [x] P0 Persist bundle → public `/b/<id>` page (no auth required) — `convex/bundles.ts` `makePublic`/`getPublic` + `src/app/b/[id]/page.tsx` (Server Component, `fetchQuery`)
-- [x] P0 OG meta tags for social previews — `generateMetadata` using bundle theme/rationale
+- [x] P0 OG meta tags for social previews — `generateMetadata` using bundle theme/rationale; **OG/Twitter preview images added 2026-07-22** — `src/app/opengraph-image.tsx` (site-wide default) + `src/app/b/[id]/opengraph-image.tsx` (dynamic, shows the bundle's theme), both via Next's built-in `next/og` `ImageResponse` (free, no external service). Shared links previously rendered as bare text on Reddit/iMessage/Twitter — no image meant much lower click-through on the core share loop.
 - [x] P0 Events: bundle_shared, shared_bundle_viewed — verified live: share → clipboard copy → `/b/<id>` renders real content server-side; malformed/private id gracefully shows "isn't available"
 
 ### Trending (F6) — ✅ P0 scope complete 2026-07-17

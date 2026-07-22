@@ -29,6 +29,7 @@ export async function generateMetadata({
     title: `${bundle.theme} — PerfectBundle`,
     description: bundle.rationale,
     openGraph: { title: bundle.theme, description: bundle.rationale },
+    twitter: { card: "summary_large_image", title: bundle.theme, description: bundle.rationale },
   };
 }
 

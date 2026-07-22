@@ -29,6 +29,11 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     type: "website",
   },
+  twitter: {
+    card: "summary_large_image",
+    title: TITLE,
+    description: DESCRIPTION,
+  },
 };
 
 export default function RootLayout({
