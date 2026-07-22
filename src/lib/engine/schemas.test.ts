@@ -40,12 +40,17 @@ describe("bundleContentSchema", () => {
 });
 
 describe("seed data", () => {
-  it("contains 5 curated bundles, all valid and approved", () => {
-    expect(seedCuratedBundles).toHaveLength(5);
+  it("contains 23 curated bundles, all valid and approved", () => {
+    expect(seedCuratedBundles).toHaveLength(23);
     for (const b of seedCuratedBundles) {
       const parsed = curatedBundleSchema.safeParse(b);
       expect(parsed.success, `invalid: ${b.title} ${JSON.stringify(parsed.success ? "" : parsed.error.issues)}`).toBe(true);
       expect(b.approved).toBe(true);
     }
+  });
+
+  it("has no duplicate titles — seedAdditionalCurated matches by title to stay idempotent", () => {
+    const titles = seedCuratedBundles.map((b) => b.title);
+    expect(new Set(titles).size).toBe(titles.length);
   });
 });

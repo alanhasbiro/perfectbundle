@@ -77,7 +77,7 @@
 ### Trending (F6) — ✅ P0 scope complete 2026-07-17
 - [x] P0 Trending page listing curated bundles — `src/app/trending/page.tsx`, linked from landing page
 - [x] P0 Admin script: generate curated candidates via engine → owner approves into curatedBundles — done at M1 via `convex/seedData.ts` (5 hand-authored bundles); a generator *script* (as opposed to hand-authoring) is optional tooling, not required for P0
-- [x] P0 Seed 20–30 curated bundles before launch — 5 seeded now (sufficient for MVP launch scale); growing to 20–30 is a pre-launch (M6) content task, not a code task
+- [x] P0 Seed 20–30 curated bundles before launch — grown from 5 to 23 (2026-07-22 content batch via `seedAdditionalCurated`, idempotent by title); within target range
 - [x] P0 Events: trending_viewed, curated_bundle_opened
 
 **Dependencies:** Milestone 1
