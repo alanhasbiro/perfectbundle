@@ -1,6 +1,7 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import { MotionConfigProvider } from "@/components/motion-config-provider";
@@ -56,6 +57,12 @@ export default function RootLayout({
           </MotionConfigProvider>
         </ClerkProvider>
       </body>
+      <Script
+        async
+        src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-9391534437442090"
+        crossOrigin="anonymous"
+        strategy="afterInteractive"
+      />
     </html>
   );
 }
