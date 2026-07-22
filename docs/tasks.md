@@ -24,7 +24,7 @@
 ### Database & Schema
 - [x] P0 Define Convex schema: bundles, curatedBundles, generationCache, engagementCounters, rateLimits (see docs/data-schema.md)
 - [x] P0 Seed script: 5 sample curated bundles for dev (idempotent, verified on local deployment)
-- [ ] P0 PostHog project created; `page_view` with UTM capture verified (code in place, env-gated; owner to create PostHog project + set key in Vercel)
+- [x] P0 PostHog project created; `page_view` with UTM capture verified — confirmed via M3 closeout 2026-07-20: PostHog API showed real `$pageview` events with recent timestamps
 
 **Dependencies:** None
 **Blockers to watch:** none known
