@@ -60,7 +60,7 @@ function SavedToggle({ bundleId }: { bundleId: Id<"bundles"> }) {
       disabled={saved === undefined}
       className={`${BASE_CLASS} ${
         saved
-          ? "border-foreground/50 bg-foreground text-background"
+          ? "border-accent-solid bg-accent-solid text-white"
           : "border-foreground/20 hover:border-foreground/50"
       }`}
     >

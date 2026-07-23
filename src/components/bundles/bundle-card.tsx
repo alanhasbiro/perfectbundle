@@ -103,7 +103,7 @@ export function BundleCard({
   return (
     <article
       data-testid={bundleId ? `bundle-card-${bundleId}` : undefined}
-      className="flex flex-col gap-4 rounded-2xl border border-foreground/15 p-6"
+      className="card-surface flex flex-col gap-4 p-6"
     >
       <div className="flex items-start justify-between gap-4">
         <div>
@@ -117,7 +117,7 @@ export function BundleCard({
               type="button"
               onClick={handleShare}
               disabled={shareState === "sharing"}
-              className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs transition hover:border-foreground/50"
+              className="btn-secondary"
             >
               {shareState === "copied" ? "Link copied!" : "Share"}
             </button>
@@ -125,7 +125,7 @@ export function BundleCard({
               type="button"
               onClick={handleRegenerate}
               disabled={regenerating}
-              className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs transition hover:border-foreground/50 disabled:opacity-50"
+              className="btn-secondary"
             >
               {regenerating ? "Regenerating…" : "🔄 Regenerate"}
             </button>
@@ -142,7 +142,7 @@ export function BundleCard({
         {content.items.map((item, itemIndex) => {
           const links = buildRetailerLinks(item.searchQuery, country, urgency);
           return (
-            <li key={item.name} className="rounded-xl border border-foreground/10 p-4">
+            <li key={item.name} className="rounded-xl border border-border bg-background p-4">
               <div className="flex gap-3">
                 {item.imageUrl ? (
                   <div className="shrink-0">
@@ -201,7 +201,7 @@ export function BundleCard({
                     target="_blank"
                     rel="noopener noreferrer sponsored"
                     onClick={() => onLinkClick?.(item.productMerchant ?? "sovrn", item)}
-                    className="rounded-full bg-foreground px-3 py-1.5 text-xs text-background transition hover:opacity-85"
+                    className="btn-primary px-3 py-1.5 text-xs"
                   >
                     Buy{item.productMerchant ? ` at ${item.productMerchant}` : ""}
                   </a>
@@ -213,7 +213,7 @@ export function BundleCard({
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={() => onLinkClick?.(link.retailer, item)}
-                    className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs transition hover:border-foreground/50"
+                    className="btn-secondary"
                   >
                     {item.productUrl ? `Or ${link.label}` : link.label}
                   </a>
@@ -223,7 +223,7 @@ export function BundleCard({
                     type="button"
                     onClick={() => handleSwapItem(bundleId, itemIndex, item.name)}
                     disabled={swappingIndex === itemIndex}
-                    className="rounded-full border border-foreground/20 px-3 py-1.5 text-xs opacity-70 transition hover:border-foreground/50 hover:opacity-100 disabled:opacity-40"
+                    className="btn-secondary"
                   >
                     {swappingIndex === itemIndex ? "Swapping…" : "🔄 Show me another"}
                   </button>
