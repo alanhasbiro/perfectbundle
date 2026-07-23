@@ -10,6 +10,7 @@ import { getOrCreateSessionId } from "@/lib/session-id";
 import { budgetBand } from "@/lib/bundles/budget-status";
 import { track } from "@/lib/analytics";
 import { BundleCard } from "@/components/bundles/bundle-card";
+import { AdUnit } from "@/components/ad-unit";
 import type { BundleItemLike } from "@/components/bundles/bundle-card-types";
 import { PROFILE_ID_KEY } from "@/components/quiz/use-quiz";
 
@@ -151,14 +152,18 @@ function ResultsForAnswers({
         {curated === undefined ? (
           <p className="opacity-60">Loading…</p>
         ) : (
-          curated.map((bundle) => (
-            <BundleCard
-              key={bundle._id}
-              content={bundle}
-              country="US"
-              urgency="normal"
-              onLinkClick={(retailer, item) => handleLinkClick(bundle._id, retailer, item, "curated")}
-            />
+          curated.map((bundle, i) => (
+            <div key={bundle._id} className="flex flex-col gap-6">
+              <BundleCard
+                content={bundle}
+                country="US"
+                urgency="normal"
+                onLinkClick={(retailer, item) => handleLinkClick(bundle._id, retailer, item, "curated")}
+              />
+              {i === 1 ? (
+                <AdUnit slot="8812435332" format="fluid" layoutKey="-fc+5g+70-cl-1m" />
+              ) : null}
+            </div>
           ))
         )}
         <Link href="/quiz" className="text-sm underline opacity-70 hover:opacity-100">
@@ -174,16 +179,20 @@ function ResultsForAnswers({
       {generatedBundles === undefined ? (
         <p className="opacity-60">Loading…</p>
       ) : (
-        generatedBundles.map((bundle) => (
-          <BundleCard
-            key={bundle._id}
-            content={bundle}
-            budget={answers.budget}
-            country={answers.country}
-            urgency={answers.urgency}
-            bundleId={bundle._id}
-            onLinkClick={(retailer, item) => handleLinkClick(bundle._id, retailer, item)}
-          />
+        generatedBundles.map((bundle, i) => (
+          <div key={bundle._id} className="flex flex-col gap-6">
+            <BundleCard
+              content={bundle}
+              budget={answers.budget}
+              country={answers.country}
+              urgency={answers.urgency}
+              bundleId={bundle._id}
+              onLinkClick={(retailer, item) => handleLinkClick(bundle._id, retailer, item)}
+            />
+            {i === 1 ? (
+              <AdUnit slot="8812435332" format="fluid" layoutKey="-fc+5g+70-cl-1m" />
+            ) : null}
+          </div>
         ))
       )}
       <Link href="/quiz" className="text-sm underline opacity-70 hover:opacity-100">

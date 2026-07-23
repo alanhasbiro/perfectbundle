@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useMutation, useQuery } from "convex/react";
 import { api } from "../../../convex/_generated/api";
 import { BundleCard } from "@/components/bundles/bundle-card";
+import { AdUnit } from "@/components/ad-unit";
 import { track } from "@/lib/analytics";
 import type { BundleItemLike } from "@/components/bundles/bundle-card-types";
 
@@ -39,17 +40,22 @@ export default function TrendingPage() {
           Crowd-pleasing bundles you can browse without taking the quiz.
         </p>
       </div>
+      <AdUnit slot="1834149356" format="auto" fullWidthResponsive />
       {curated === undefined ? (
         <p className="opacity-60">Loading…</p>
       ) : (
-        curated.map((bundle) => (
-          <BundleCard
-            key={bundle._id}
-            content={bundle}
-            country={DEFAULT_COUNTRY}
-            urgency={DEFAULT_URGENCY}
-            onLinkClick={(retailer, item) => handleLinkClick(bundle._id, retailer, item)}
-          />
+        curated.map((bundle, i) => (
+          <div key={bundle._id} className="flex flex-col gap-6">
+            <BundleCard
+              content={bundle}
+              country={DEFAULT_COUNTRY}
+              urgency={DEFAULT_URGENCY}
+              onLinkClick={(retailer, item) => handleLinkClick(bundle._id, retailer, item)}
+            />
+            {i === 1 ? (
+              <AdUnit slot="8812435332" format="fluid" layoutKey="-fc+5g+70-cl-1m" />
+            ) : null}
+          </div>
         ))
       )}
       <div className="flex flex-wrap gap-4 text-sm">
