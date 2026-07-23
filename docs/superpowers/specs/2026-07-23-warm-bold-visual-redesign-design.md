@@ -22,11 +22,13 @@ New CSS custom properties in `src/app/globals.css`, replacing the current two-va
 | `--bg` | `#FFFBF5` | `#1A1210` | page background |
 | `--bg-alt` | `#FFF1E0` | `#241813` | section/card backgrounds |
 | `--fg` | `#3D2B1F` | `#FBE9D8` | primary text |
-| `--fg-muted` | `#8B6A4F` | `#C9A47C` | secondary text/captions |
-| `--accent-from` | `#F97316` | `#F97316` | gradient CTA start |
-| `--accent-to` | `#DB2777` | `#DB2777` | gradient CTA end |
-| `--accent-solid` | `#EA580C` | `#FB923C` | links, focus rings, icons (non-gradient contexts) |
-| `--border` | `#FFE0BE` | `#3A2A20` | card/input borders |
+| `--fg-muted` | `#7A5C3E` | `#C9A47C` | secondary text/captions |
+| `--accent-from` | `#C2410C` | `#C2410C` | gradient CTA start (white text) |
+| `--accent-to` | `#BE185D` | `#BE185D` | gradient CTA end (white text) |
+| `--accent-solid` | `#C2410C` | `#FB923C` | links, focus rings, icons (non-gradient contexts) |
+| `--border` | `#FFE0BE` | `#3A2A20` | card/input borders (decorative, not a text pair) |
+
+*(Revised 2026-07-23 during planning: the first-draft hex values for `fg-muted`/`accent-from`/`accent-to`/`accent-solid` measured below 4.5:1 against their real use pairs by WCAG relative-luminance calculation — e.g. white button text on the original `#F97316` gradient endpoint was 2.80:1. Values above are the corrected ones; every pair is asserted by the contrast test added in the implementation plan.)*
 
 Typography stays 100% Geist (already self-hosted via `next/font` — no new font load, no risk to the existing Lighthouse baseline). Headlines move to `font-bold`/`font-extrabold`; body text stays regular weight. Every token pair must be verified ≥4.5:1 contrast before this ships — the same bar the 2026-07-22 a11y pass enforced (it caught and fixed `opacity-50` text scoring 3.4:1).
 
