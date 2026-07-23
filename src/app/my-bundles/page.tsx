@@ -20,7 +20,7 @@ export default function MyBundlesPage() {
         <h1 className="text-2xl font-semibold">Your saved bundles</h1>
         <p className="opacity-70">Sign in to see the bundles you&apos;ve saved.</p>
         <SignInButton mode="modal">
-          <button className="rounded-full bg-foreground px-6 py-2.5 text-background transition hover:opacity-85">
+          <button className="btn-primary">
             Sign in
           </button>
         </SignInButton>
@@ -42,7 +42,7 @@ export default function MyBundlesPage() {
           <p className="opacity-70">You haven&apos;t saved any bundles yet.</p>
           <Link
             href="/quiz"
-            className="rounded-full bg-foreground px-6 py-2.5 text-background transition hover:opacity-85"
+            className="btn-primary"
           >
             Take the quiz
           </Link>

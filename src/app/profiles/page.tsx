@@ -54,7 +54,7 @@ export default function ProfilesPage() {
         <h1 className="text-2xl font-semibold">Recipient profiles</h1>
         <p className="opacity-70">Sign in to save the people you buy for.</p>
         <SignInButton mode="modal">
-          <button className="rounded-full bg-foreground px-6 py-2.5 text-background transition hover:opacity-85">
+          <button className="btn-primary">
             Sign in
           </button>
         </SignInButton>
@@ -73,7 +73,7 @@ export default function ProfilesPage() {
               setAdding(true);
               setEditingId(null);
             }}
-            className="rounded-full bg-foreground px-4 py-2 text-sm text-background transition hover:opacity-85"
+            className="btn-primary px-4 py-2 text-sm"
           >
             + New profile
           </button>
@@ -122,7 +122,7 @@ export default function ProfilesPage() {
           ) : (
             <article
               key={p._id}
-              className="flex flex-col gap-3 rounded-2xl border border-foreground/15 p-6"
+              className="card-surface flex flex-col gap-3 p-6"
             >
               <div className="flex items-start justify-between gap-4">
                 <div>
@@ -141,7 +141,7 @@ export default function ProfilesPage() {
                 <button
                   type="button"
                   onClick={() => startBundlesFor(p)}
-                  className="rounded-full bg-foreground px-4 py-1.5 text-xs text-background transition hover:opacity-85"
+                  className="btn-primary px-4 py-1.5 text-xs"
                 >
                   New bundles for {p.name}
                 </button>
@@ -151,14 +151,14 @@ export default function ProfilesPage() {
                     setEditingId(p._id);
                     setAdding(false);
                   }}
-                  className="rounded-full border border-foreground/20 px-4 py-1.5 text-xs transition hover:border-foreground/50"
+                  className="btn-secondary"
                 >
                   Edit
                 </button>
                 <button
                   type="button"
                   onClick={() => remove({ id: p._id })}
-                  className="rounded-full border border-foreground/20 px-4 py-1.5 text-xs opacity-70 transition hover:border-foreground/50 hover:opacity-100"
+                  className="btn-secondary"
                 >
                   Delete
                 </button>

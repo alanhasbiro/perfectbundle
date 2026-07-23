@@ -45,7 +45,7 @@ export default async function SharedBundlePage({
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-4 px-6 text-center">
         <p className="opacity-70">This bundle isn&apos;t available.</p>
-        <Link href="/quiz" className="rounded-full bg-foreground px-6 py-2.5 text-background">
+        <Link href="/quiz" className="btn-primary">
           Build your own
         </Link>
       </main>
