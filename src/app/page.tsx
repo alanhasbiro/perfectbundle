@@ -31,7 +31,7 @@ export default function Home() {
       >
         <Link
           href="/quiz"
-          className="rounded-full bg-foreground px-8 py-3 text-background transition hover:opacity-85"
+          className="btn-primary"
         >
           Start the quiz
         </Link>

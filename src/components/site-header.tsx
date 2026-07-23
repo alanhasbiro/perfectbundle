@@ -13,16 +13,16 @@ export function SiteHeader() {
             <button className="opacity-70 hover:opacity-100">Sign in</button>
           </SignInButton>
           <SignUpButton>
-            <button className="rounded-full bg-foreground px-4 py-1.5 text-background transition hover:opacity-85">
+            <button className="btn-primary px-4 py-1.5 text-xs">
               Sign up
             </button>
           </SignUpButton>
         </Show>
         <Show when="signed-in">
-          <Link href="/my-bundles" className="opacity-70 hover:opacity-100">
+          <Link href="/my-bundles" className="opacity-70 transition hover:text-accent-solid hover:opacity-100">
             My bundles
           </Link>
-          <Link href="/profiles" className="opacity-70 hover:opacity-100">
+          <Link href="/profiles" className="opacity-70 transition hover:text-accent-solid hover:opacity-100">
             Profiles
           </Link>
           <UserButton />
