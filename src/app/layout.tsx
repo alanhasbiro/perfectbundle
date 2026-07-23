@@ -48,7 +48,19 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <ClerkProvider>
+        <ClerkProvider
+          appearance={{
+            variables: {
+              colorPrimary: "var(--accent-solid)",
+              colorBackground: "var(--background)",
+              colorText: "var(--foreground)",
+              colorTextSecondary: "var(--fg-muted)",
+              colorInputBackground: "var(--background)",
+              colorInputText: "var(--foreground)",
+              borderRadius: "0.75rem",
+            },
+          }}
+        >
           <MotionConfigProvider>
             <ConvexClientProvider>
               <SiteHeader />
