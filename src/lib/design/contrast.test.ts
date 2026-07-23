@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { contrastRatio } from "./contrast";
+import { blendHex, contrastRatio } from "./contrast";
 
 describe("contrastRatio", () => {
   test("white on black is the maximum ratio (21:1)", () => {
@@ -41,4 +41,27 @@ describe("PerfectBundle warm palette meets WCAG 4.5:1 for text pairs", () => {
   test.each(pairs)("%s is >= 4.5:1", (_label, bg, fg) => {
     expect(contrastRatio(bg, fg)).toBeGreaterThanOrEqual(AA_TEXT);
   });
+});
+
+describe("opacity-based muted text (bare `opacity-NN` on --foreground) meets WCAG 4.5:1 in light mode", () => {
+  const AA_TEXT = 4.5;
+  const FOREGROUND = "#3D2B1F";
+  // The safe floor for plain --foreground text at reduced opacity in light
+  // mode. Regression guard for the warm-palette redesign bug where a bare
+  // `opacity-60` utility (inherited from the previous black/white palette)
+  // no longer cleared 4.5:1 against the new light backgrounds.
+  const SAFE_OPACITY = 0.7;
+
+  const backgrounds: Array<[label: string, bg: string]> = [
+    ["light bg", "#FFFBF5"],
+    ["light bg-alt", "#FFF1E0"],
+  ];
+
+  test.each(backgrounds)(
+    "--foreground at opacity-70 (the fixed floor) blended over %s is >= 4.5:1",
+    (_label, bg) => {
+      const blended = blendHex(FOREGROUND, bg, SAFE_OPACITY);
+      expect(contrastRatio(bg, blended)).toBeGreaterThanOrEqual(AA_TEXT);
+    }
+  );
 });

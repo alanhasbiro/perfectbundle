@@ -26,7 +26,7 @@ export default function PopularPage() {
         </p>
       </div>
       {popular === undefined ? (
-        <p className="opacity-60">Loading…</p>
+        <p className="opacity-70">Loading…</p>
       ) : popular.length === 0 ? (
         <p className="rounded-xl border border-foreground/15 p-4 text-sm opacity-70">
           No popular bundles yet — take the quiz and share yours to get things started.

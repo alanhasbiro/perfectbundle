@@ -135,7 +135,7 @@ export function BundleCard({
 
       <div className="flex items-center gap-2 text-sm">
         <span className="font-medium">Est. total: {content.estTotal}</span>
-        {budgetLabel ? <span className="opacity-60">· {budgetLabel}</span> : null}
+        {budgetLabel ? <span className="opacity-70">· {budgetLabel}</span> : null}
       </div>
 
       <ul className="flex flex-col gap-4">
@@ -158,11 +158,11 @@ export function BundleCard({
                 <div className="min-w-0 flex-1">
                   <p className="font-medium">{item.name}</p>
                   <p className="mt-1 text-sm opacity-70">{item.description}</p>
-                  <p className="mt-1 text-sm italic opacity-60">{item.why}</p>
+                  <p className="mt-1 text-sm italic opacity-70">{item.why}</p>
                 </div>
               </div>
               {item.imageIsRepresentative ? (
-                <p className="mt-2 text-xs opacity-60">
+                <p className="mt-2 text-xs opacity-70">
                   Representative image
                   {item.imageCreditName ? (
                     <>
@@ -191,7 +191,7 @@ export function BundleCard({
               <p className="mt-2 text-sm font-medium">
                 {item.productPrice ? item.productPrice : item.estPriceRange}
                 {item.productPrice ? (
-                  <span className="ml-1 text-xs font-normal opacity-60">at {item.productMerchant}</span>
+                  <span className="ml-1 text-xs font-normal opacity-70">at {item.productMerchant}</span>
                 ) : null}
               </p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -234,7 +234,7 @@ export function BundleCard({
         })}
       </ul>
       {hasAffiliateLinks ? (
-        <p className="text-xs opacity-60">
+        <p className="text-xs opacity-70">
           Some “Buy” links are affiliate links — we may earn a small commission at no extra cost to you.
         </p>
       ) : null}

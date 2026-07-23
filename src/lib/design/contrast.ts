@@ -23,3 +23,25 @@ export function contrastRatio(hexA: string, hexB: string): number {
   const darker = Math.min(lumA, lumB);
   return (lighter + 0.05) / (darker + 0.05);
 }
+
+/**
+ * Alpha-composites `hexFg` (at `alpha`, 0–1) over `hexBg` and returns the
+ * resulting opaque hex color. Mirrors how a browser renders a CSS
+ * `opacity-NN` utility on plain (no explicit color class) foreground text:
+ * a straight per-channel linear interpolation of the two colors' sRGB byte
+ * values — the same non-linear space the bytes are already encoded in, not
+ * the physically-linear space `relativeLuminance` converts into. Used to
+ * regression-test that opacity-based "muted text" tricks still clear WCAG
+ * AA against the actual rendered (blended) color, not just the raw token.
+ */
+export function blendHex(hexFg: string, hexBg: string, alpha: number): string {
+  const fg = hexFg.replace("#", "");
+  const bg = hexBg.replace("#", "");
+  const blendChannel = (start: number) => {
+    const f = parseInt(fg.slice(start, start + 2), 16);
+    const b = parseInt(bg.slice(start, start + 2), 16);
+    return Math.round(f * alpha + b * (1 - alpha));
+  };
+  const toHex = (n: number) => n.toString(16).padStart(2, "0");
+  return `#${toHex(blendChannel(0))}${toHex(blendChannel(2))}${toHex(blendChannel(4))}`;
+}

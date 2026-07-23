@@ -36,7 +36,7 @@ export default function MyBundlesPage() {
     <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-6 py-10">
       <h1 className="text-3xl font-semibold">Your saved bundles 🔖</h1>
       {saved === undefined ? (
-        <p className="opacity-60">Loading…</p>
+        <p className="opacity-70">Loading…</p>
       ) : saved.length === 0 ? (
         <div className="flex flex-col items-start gap-4">
           <p className="opacity-70">You haven&apos;t saved any bundles yet.</p>

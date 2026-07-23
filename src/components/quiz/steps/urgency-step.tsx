@@ -27,7 +27,7 @@ export function UrgencyStep({ state, patch }: StepProps) {
             }`}
           >
             <span className="block font-medium">{o.label}</span>
-            <span className="block text-sm opacity-60">{o.hint}</span>
+            <span className="block text-sm opacity-70">{o.hint}</span>
           </button>
         ))}
       </div>

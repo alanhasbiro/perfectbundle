@@ -42,7 +42,7 @@ export default function TrendingPage() {
       </div>
       <AdUnit slot="1834149356" format="auto" fullWidthResponsive />
       {curated === undefined ? (
-        <p className="opacity-60">Loading…</p>
+        <p className="opacity-70">Loading…</p>
       ) : (
         curated.map((bundle, i) => (
           <div key={bundle._id} className="flex flex-col gap-6">

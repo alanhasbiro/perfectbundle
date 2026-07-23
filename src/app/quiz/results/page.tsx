@@ -138,7 +138,7 @@ function ResultsForAnswers({
     return (
       <main className="flex min-h-screen flex-col items-center justify-center gap-3 px-6 text-center">
         <p className="text-lg">Building your bundles…</p>
-        <p className="text-sm opacity-60">This usually takes a few seconds.</p>
+        <p className="text-sm opacity-70">This usually takes a few seconds.</p>
       </main>
     );
   }
@@ -150,7 +150,7 @@ function ResultsForAnswers({
           We hit a snag generating something new — here are some crowd-pleasers instead.
         </p>
         {curated === undefined ? (
-          <p className="opacity-60">Loading…</p>
+          <p className="opacity-70">Loading…</p>
         ) : (
           curated.map((bundle, i) => (
             <div key={bundle._id} className="flex flex-col gap-6">
@@ -177,7 +177,7 @@ function ResultsForAnswers({
     <main className="mx-auto flex min-h-screen w-full max-w-2xl flex-col gap-6 px-6 py-10">
       <h1 className="text-3xl font-semibold">Your gift bundles 🎁</h1>
       {generatedBundles === undefined ? (
-        <p className="opacity-60">Loading…</p>
+        <p className="opacity-70">Loading…</p>
       ) : (
         generatedBundles.map((bundle, i) => (
           <div key={bundle._id} className="flex flex-col gap-6">

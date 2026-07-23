@@ -93,7 +93,7 @@ export default function ProfilesPage() {
       ) : null}
 
       {profiles === undefined ? (
-        <p className="opacity-60">Loading…</p>
+        <p className="opacity-70">Loading…</p>
       ) : profiles.length === 0 && !adding ? (
         <p className="opacity-70">
           No profiles yet. Save someone you buy for and skip the “who’s it for”
@@ -136,7 +136,7 @@ export default function ProfilesPage() {
               {p.interests.length > 0 ? (
                 <p className="text-sm opacity-70">{p.interests.join(", ")}</p>
               ) : null}
-              {p.notes ? <p className="text-sm italic opacity-60">{p.notes}</p> : null}
+              {p.notes ? <p className="text-sm italic opacity-70">{p.notes}</p> : null}
               <div className="mt-1 flex flex-wrap gap-2">
                 <button
                   type="button"

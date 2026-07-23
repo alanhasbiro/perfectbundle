@@ -18,7 +18,7 @@ export function QuizWizard({ steps }: { steps: Record<QuizStepId, ComponentType<
   if (!state) {
     return (
       <main className="flex min-h-screen items-center justify-center">
-        <p className="opacity-60">Loading…</p>
+        <p className="opacity-70">Loading…</p>
       </main>
     );
   }
