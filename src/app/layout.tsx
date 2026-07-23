@@ -59,6 +59,22 @@ export default function RootLayout({
               colorInputText: "var(--foreground)",
               borderRadius: "0.75rem",
             },
+            elements: {
+              // UserButton popover action buttons ("Manage account", "Sign out")
+              // don't inherit colorText/colorTextSecondary from the variables above,
+              // so their text color is set explicitly here.
+              userButtonPopoverActionButton: {
+                color: "var(--foreground)",
+              },
+              // User email/identifier text in the popover header.
+              userPreviewMainIdentifierText: {
+                color: "var(--foreground)",
+              },
+              // Popover footer ("Secured by Clerk").
+              userButtonPopoverFooter: {
+                color: "var(--fg-muted)",
+              },
+            },
           }}
         >
           <MotionConfigProvider>
