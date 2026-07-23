@@ -54,3 +54,6 @@ next-env.d.ts
 
 # superpowers brainstorming companion mockups
 .superpowers/
+
+# superpowers git worktrees (isolated execution workspaces)
+.worktrees/
