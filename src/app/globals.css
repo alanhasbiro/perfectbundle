@@ -1,26 +1,57 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #FFFBF5;
+  --foreground: #3D2B1F;
+  --bg-alt: #FFF1E0;
+  --fg-muted: #7A5C3E;
+  --accent-from: #C2410C;
+  --accent-to: #BE185D;
+  --accent-solid: #C2410C;
+  --border: #FFE0BE;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-bg-alt: var(--bg-alt);
+  --color-fg-muted: var(--fg-muted);
+  --color-accent-from: var(--accent-from);
+  --color-accent-to: var(--accent-to);
+  --color-accent-solid: var(--accent-solid);
+  --color-border: var(--border);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1A1210;
+    --foreground: #FBE9D8;
+    --bg-alt: #241813;
+    --fg-muted: #C9A47C;
+    --accent-solid: #FB923C;
+    --border: #3A2A20;
   }
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+@layer components {
+  .btn-primary {
+    @apply rounded-full px-6 py-3 text-sm font-bold text-white shadow-md transition hover:opacity-90 disabled:opacity-40;
+    background-image: linear-gradient(135deg, var(--accent-from), var(--accent-to));
+  }
+
+  .btn-secondary {
+    @apply rounded-full border border-border px-4 py-1.5 text-xs font-medium text-accent-solid transition hover:border-accent-solid disabled:opacity-40;
+  }
+
+  .card-surface {
+    @apply rounded-2xl border border-border bg-bg-alt;
+  }
 }
