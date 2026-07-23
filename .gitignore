@@ -51,3 +51,6 @@ next-env.d.ts
 
 .vercel
 .env*
+
+# superpowers brainstorming companion mockups
+.superpowers/
