@@ -61,8 +61,8 @@ export default function RootLayout({
             },
             elements: {
               // UserButton popover action buttons ("Manage account", "Sign out")
-              // don't inherit colorText/colorTextSecondary from the variables above,
-              // so their text color is set explicitly here.
+              // don't inherit colorForeground/colorMutedForeground from the variables
+              // above, so their text color is set explicitly here.
               userButtonPopoverActionButton: {
                 color: "var(--foreground)",
               },
