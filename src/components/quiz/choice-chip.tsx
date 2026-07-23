@@ -16,7 +16,7 @@ export function ChoiceChip({
       aria-pressed={selected}
       className={`rounded-full border px-4 py-2 text-sm transition ${
         selected
-          ? "border-foreground bg-foreground text-background"
+          ? "border-accent-solid bg-accent-solid text-white"
           : "border-foreground/20 hover:border-foreground/50"
       }`}
     >

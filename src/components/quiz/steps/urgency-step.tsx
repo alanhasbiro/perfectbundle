@@ -22,7 +22,7 @@ export function UrgencyStep({ state, patch }: StepProps) {
             aria-pressed={state.answers.urgency === o.value}
             className={`rounded-xl border px-4 py-3 text-left transition ${
               state.answers.urgency === o.value
-                ? "border-foreground bg-foreground/5"
+                ? "border-accent-solid bg-accent-solid/10"
                 : "border-foreground/20 hover:border-foreground/50"
             }`}
           >

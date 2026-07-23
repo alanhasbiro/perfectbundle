@@ -29,7 +29,7 @@ export function QuizWizard({ steps }: { steps: Record<QuizStepId, ComponentType<
     <main className="mx-auto flex min-h-screen w-full max-w-xl flex-col px-6 py-10">
       <div className="mb-8 h-1.5 w-full overflow-hidden rounded-full bg-foreground/10">
         <motion.div
-          className="h-full rounded-full bg-foreground"
+          className="h-full rounded-full bg-gradient-to-r from-accent-from to-accent-to"
           animate={{ width: `${Math.max(progressValue * 100, 4)}%` }}
           transition={{ duration: 0.4 }}
         />
@@ -63,7 +63,7 @@ export function QuizWizard({ steps }: { steps: Record<QuizStepId, ComponentType<
           type="button"
           onClick={isLastStep ? submit : goNext}
           disabled={!canGoNext}
-          className="rounded-full bg-foreground px-8 py-3 text-background transition hover:opacity-85 disabled:opacity-30"
+          className="btn-primary px-8 py-3"
         >
           {isLastStep ? "Build my bundles" : "Next"}
         </button>
