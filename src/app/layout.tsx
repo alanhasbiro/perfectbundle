@@ -53,10 +53,10 @@ export default function RootLayout({
             variables: {
               colorPrimary: "var(--accent-solid)",
               colorBackground: "var(--background)",
-              colorText: "var(--foreground)",
-              colorTextSecondary: "var(--fg-muted)",
-              colorInputBackground: "var(--background)",
-              colorInputText: "var(--foreground)",
+              colorForeground: "var(--foreground)",
+              colorMutedForeground: "var(--fg-muted)",
+              colorInput: "var(--background)",
+              colorInputForeground: "var(--foreground)",
               borderRadius: "0.75rem",
             },
             elements: {
