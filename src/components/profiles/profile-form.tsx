@@ -63,7 +63,7 @@ export function ProfileForm({
   };
 
   return (
-    <div className="flex flex-col gap-5 rounded-2xl border border-foreground/15 p-6">
+    <div className="card-surface flex flex-col gap-5 p-6">
       <div>
         <label htmlFor="pname" className="mb-2 block text-sm font-medium">
           Name or nickname
@@ -154,7 +154,7 @@ export function ProfileForm({
           type="button"
           onClick={handleSubmit}
           disabled={!valid || saving}
-          className="rounded-full bg-foreground px-6 py-2.5 text-sm text-background transition hover:opacity-85 disabled:opacity-40"
+          className="btn-primary px-6 py-2.5 text-sm"
         >
           {saving ? "Saving…" : submitLabel}
         </button>
@@ -162,7 +162,7 @@ export function ProfileForm({
           <button
             type="button"
             onClick={onCancel}
-            className="rounded-full border border-foreground/20 px-6 py-2.5 text-sm transition hover:border-foreground/50"
+            className="btn-secondary px-6 py-2.5 text-sm"
           >
             Cancel
           </button>
