@@ -246,6 +246,8 @@ See `docs/tasks.md` for the live task list. Summary:
 | 2026-07-23 | e00827d | fix: Clerk v7 `appearance.variables` key names (build-blocking regression found in Task 8 verification, attempt 1) |
 | 2026-07-23 | f79afc3 | docs: fix stale comment terminology after Clerk variable key rename |
 | 2026-07-23 | 8845ec2 | fix(a11y): `opacity-60`→`opacity-70` warm-palette contrast regression (found in Task 8 verification, attempt 2) + new regression test |
+| 2026-07-23 | 1cfc3b4 | docs: warm & bold visual redesign completion (checkpoint + handover) |
+| 2026-07-23 | 2083e77 | fix: apply warm styling to `ProfileForm` — missed by every task's file list (found in final whole-branch review), still had the old flat-black submit button on `/profiles`' create/edit flows |
 
 ---
 
